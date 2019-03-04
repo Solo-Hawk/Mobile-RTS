@@ -15,6 +15,11 @@ var config = {
     }
   },
   scene: [SceneLoader, SceneMenu, SceneLevelDevelopment],
+  plugins: {
+    scene: [
+      { key: "NavMeshPlugin", plugin: PhaserNavMeshPlugin, mapping: "navMeshPlugin", start: true }
+    ]
+  }
 
 }
 
