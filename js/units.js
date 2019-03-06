@@ -26,6 +26,11 @@ var util = {
                 this.y *= s;
                 return this;
             },
+            truncate: function(max) {
+              var i = max / this.length()
+              i = i < 1.0 ? i : 1.0
+              this.scale(i)
+            },
             length: function () {
                 return Math.sqrt((this.x * this.x) + (this.y * this.y));
             },
@@ -35,10 +40,10 @@ var util = {
                 return this;
             },
             toAngle: function () {return -Math.atan2(-this.y, this.x) },
-            angleTo: function (a) {
+            angleTo: function (rad) {
                 var len = this.length();
-                this.x = len * Math.cos(Math.PI / 180 * a);
-                this.y = len * Math.sin(Math.PI / 180 * a);
+                this.x = len * Math.cos(rad);
+                this.y = len * Math.sin(rad);
                 return this;
 
             },
@@ -66,6 +71,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.debug.steering = this.scene.add.line(x, y, 0,0,0,0, 0xFF0000)
 
     this.scene = scene;
+    this.setScale(0.4)
 
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
@@ -83,7 +89,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.maxAngularRotation = 0.2; // In Degress
 
     // setInterval(() => {console.clear()},3000)
-    Phaser.Physics.Matter.Matter.Body.setVelocity(this.body, {x:-100, y:-100})
+    // Phaser.Physics.Matter.Matter.Body.setVelocity(this.body, {x:-100, y:-100})
 
   }
 
@@ -108,19 +114,30 @@ class Steerable extends Phaser.GameObjects.Sprite {
     return {x:this.x, y:this.y}
   }
 
+  getVelocity(){// if the velocity is 0,0 the steering will have issues processing any movement. The velocity is given a normalised vector in the direction of the ship
+    var vel = util.vector2d(this.body.velocity.x, this.body.velocity.y)
+    if(vel.x == 0 && vel.y == 0){
+      vel.x = 1;
+      vel.y = 1;
+      vel.normalise().angleTo(this.rotation)
+    }
+    return vel
+  }
+
+  setBodyVelocity(v){
+    Phaser.Physics.Matter.Matter.Body.setVelocity(this.body, v)
+  }
+
   update(){
-    this.seek()
+    this.arrival();
 
 
     // console.log("rot", this.getRotation());
   }
 
   seek(){
-    var matterVector = Phaser.Physics.Matter.Matter.Vector
-    var matterBody   = Phaser.Physics.Matter.Matter.Body
-
     var pos = this.getPosition();
-    var vel = util.vector2d(this.body.velocity.x, this.body.velocity.y).normalise();
+    var vel = this.getVelocity().normalise();
     var desVel =
         util.vector2d(412, 206)
             .subtract(pos)
@@ -132,9 +149,9 @@ class Steerable extends Phaser.GameObjects.Sprite {
     vel.scale(this.maxLinearVelocity)
 
     this.setRotation(vel.toAngle())
-    matterBody.setVelocity(this.body, vel)
+    this.setBodyVelocity(vel)
 
-    var debug = this.scene.debugLayer
+    {var debug = this.scene.debugLayer
     debug.clear()
     debug.lineStyle(2, 0xFF0000, 1.0);
     debug.beginPath();
@@ -151,9 +168,10 @@ class Steerable extends Phaser.GameObjects.Sprite {
     debug.lineStyle(2, 0x0000FF, 1.0);
     debug.beginPath();
     debug.moveTo(pos.x + (vel.x * 10), pos.y + (vel.y * 10));
-    debug.lineTo(pos.x + (vel.x * 10) + (steering.x * 10), pos.y + (vel.y * 1) + (steering.y * 10))
+    debug.lineTo(pos.x + (vel.x * 10) + (steering.x * 100), pos.y + (vel.y * 10) + (steering.y * 100 ))
     debug.strokePath();
-    debug.closePath();
+    debug.closePath();}
+
     {// var matterVector = Phaser.Physics.Matter.Matter.Vector
     // var matterBody   = Phaser.Physics.Matter.Matter.Body
     //
@@ -258,6 +276,92 @@ class Steerable extends Phaser.GameObjects.Sprite {
     }
   }
 
+  flee(){
+    var pos = this.getPosition();
+    var vel = this.getVelocity().normalise();
+    var desVel =
+        util.vector2d(412, 206)
+            .subtract(pos)
+            .normalise()
+            .scale(-1); // normalise
+    var steering = desVel.clone().subtract(vel)
+    steering.scale(this.maxAngularRotation)
+    //steering.scale(game.delta)
+    vel.add(steering).normalise()
+    vel.scale(this.maxLinearVelocity)
+
+    this.setRotation(vel.toAngle())
+    this.setBodyVelocity(vel)
+
+    {var debug = this.scene.debugLayer
+    debug.clear()
+    debug.lineStyle(2, 0xFF0000, 1.0);
+    debug.beginPath();
+    debug.moveTo(pos.x, pos.y);
+    debug.lineTo(pos.x + (vel.x * 10), pos.y + (vel.y * 10))
+    debug.strokePath();
+    debug.closePath();
+    debug.lineStyle(2, 0x00FF00, 1.0);
+    debug.beginPath();
+    debug.moveTo(pos.x, pos.y);
+    debug.lineTo(pos.x + (desVel.x * 15), pos.y + (desVel.y * 15))
+    debug.strokePath();
+    debug.closePath();
+    debug.lineStyle(2, 0x0000FF, 1.0);
+    debug.beginPath();
+    debug.moveTo(pos.x + (vel.x * 10), pos.y + (vel.y * 10));
+    debug.lineTo(pos.x + (vel.x * 10) + (steering.x * 100), pos.y + (vel.y * 10) + (steering.y * 100 ))
+    debug.strokePath();
+    debug.closePath();}
+  }
+
+  arrival(){
+    var radius = 80;
+    var target = util.vector2d(412, 206)
+
+    var pos = this.getPosition();
+    var vel = this.getVelocity().normalise();
+    var desVel = target.clone()
+                       .subtract(pos); // normalise
+    var distance = desVel.length();
+    if (distance < radius){
+      desVel.normalise().scale(this.maxLinearAcceleration).scale(distance / radius)
+    }else{
+      desVel.normalise().scale(this.maxLinearAcceleration)
+    }
+
+    var steering = desVel.clone()
+                         .subtract(vel)
+    steering.scale(this.maxAngularRotation)
+    //steering.scale(game.delta)
+    vel.add(steering).truncate(desVel.length())
+
+
+
+    this.setRotation(vel.toAngle())
+    this.setBodyVelocity(vel)
+
+    {var debug = this.scene.debugLayer
+    debug.clear()
+    debug.lineStyle(2, 0xFF0000, 1.0);
+    debug.beginPath();
+    debug.moveTo(pos.x, pos.y);
+    debug.lineTo(pos.x + (vel.x * 10), pos.y + (vel.y * 10))
+    debug.strokePath();
+    debug.closePath();
+    debug.lineStyle(2, 0x00FF00, 1.0);
+    debug.beginPath();
+    debug.moveTo(pos.x, pos.y);
+    debug.lineTo(pos.x + (desVel.x * 15), pos.y + (desVel.y * 15))
+    debug.strokePath();
+    debug.closePath();
+    debug.lineStyle(2, 0x0000FF, 1.0);
+    debug.beginPath();
+    debug.moveTo(pos.x + (vel.x * 10), pos.y + (vel.y * 10));
+    debug.lineTo(pos.x + (vel.x * 10) + (steering.x * 100), pos.y + (vel.y * 10) + (steering.y * 100 ))
+    debug.strokePath();
+    debug.closePath();}
+  }
 
 }
 
