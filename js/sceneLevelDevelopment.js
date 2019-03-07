@@ -34,6 +34,7 @@ class SceneLevelDevelopment extends Phaser.Scene{
     // var steerable = this.add.sprite(this.width/2, this.height/2, 'red1')
     // this.rts.units.main.setTarget(this.rts.units.target)
     console.log(this.steerable);
+    this.rts.units.main.setTarget(this.rts.units.target)
   }
   update(){
     this.rts.units.main.update();

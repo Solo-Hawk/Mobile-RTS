@@ -75,14 +75,14 @@ var matterSys = {
 
 
 class Steerable extends Phaser.GameObjects.Sprite {
-  static IDLE     = 0
-  static SEEK     = 1;
-  static FLEE     = 2;
-  static ARRIVAL  = 3;
-  static WANDER   = 4;
-  static PURSUIT  = 5;
-  static EVADE    = 6;
-  static FOLLOW   = 7;
+  IDLE     : 0,
+  SEEK     : 1,
+  FLEE     : 2,
+  ARRIVAL  : 3,
+  WANDER   : 4,
+  PURSUIT  : 5,
+  EVADE    : 6,
+  FOLLOW   : 7,
 
   constructor(scene, x, y, texture, frame, options){
     super(scene, x, y, texture, frame, options)
@@ -123,7 +123,9 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.wanderForce  = util.vector2d(0,0);
     console.log(this);
   }
-
+  setTarget(target){
+    this.target = target
+  }
   update(){
     if(!this.target || !this.target.position || !this.target.linearVelocity){
       console.warn("target undefined - Target, position or linearVelocity is undefined")
