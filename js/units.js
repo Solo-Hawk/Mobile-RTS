@@ -73,8 +73,7 @@ var matterSys = {
   VECTOR: Phaser.Physics.Matter.Matter.Vector
 }
 
-
-class Steerable extends Phaser.GameObjects.Sprite {
+var steeringSys = {
   IDLE     : 0,
   SEEK     : 1,
   FLEE     : 2,
@@ -83,6 +82,9 @@ class Steerable extends Phaser.GameObjects.Sprite {
   PURSUIT  : 5,
   EVADE    : 6,
   FOLLOW   : 7,
+}
+
+class Steerable extends Phaser.GameObjects.Sprite {
 
   constructor(scene, x, y, texture, frame, options){
     super(scene, x, y, texture, frame, options)
