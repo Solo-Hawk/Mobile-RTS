@@ -47,6 +47,12 @@ var util = {
                 return this;
 
             },
+            limit: function(max){//Limits vector length to length of max as a scalar
+              if(this.length() > max){
+                this.normalise().scale(max)
+              }
+              return this;
+            },
             set: function (x, y) {
                 this.x = x;
                 this.y = y;
@@ -74,14 +80,14 @@ var matterSys = {
 }
 
 var steeringSys = {
-  IDLE     : 0,
-  SEEK     : 1,
-  FLEE     : 2,
-  ARRIVAL  : 3,
-  WANDER   : 4,
-  PURSUIT  : 5,
-  EVADE    : 6,
-  FOLLOW   : 7,
+  IDLE    : 0,
+  SEEK    : 1,
+  FLEE    : 2,
+  ARRIVAL : 3,
+  WANDER  : 4,
+  PURSUIT : 5,
+  EVADE   : 6,
+  FOLLOW  : 7
 }
 
 class Steerable extends Phaser.GameObjects.Sprite {
@@ -91,11 +97,13 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.debug = {}
 
     this.scene = scene;
-    this.setScale(0.4)
 
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
-    this.body.parent = this;
+
+
+    this.setScale(0.4)
+    matterSys.BODY.scale(this.body, 0.4, 0.4)
     //^^^^^^^^^^^^^^^^^^^^^
     //The core to the custom object
 
@@ -109,10 +117,10 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.steering               = util.vector2d(0,0)
     this.target                 = null
     this.orientation            = this.body.angle // In Radians
-    this.maxLinearSpeed         = 0;
-    this.maxLinearAcceleration  = 0;
-    this.maxAngularSpeed        = 0;
-    this.maxAngularAcceleration = 0;
+    this.maxLinearSpeed         = 10;
+    this.maxLinearAcceleration  = 4;
+    this.maxAngularSpeed        = 7;
+    this.maxAngularAcceleration = 3;
 
 
 
@@ -128,26 +136,50 @@ class Steerable extends Phaser.GameObjects.Sprite {
   setTarget(target){
     this.target = target
   }
+
+  setMoveMode(moveMode){
+    this.moveMode = moveMode
+  }
+
   update(){
+    this.position       = util.fromMatter(this.body.position)
     if(!this.target || !this.target.position || !this.target.linearVelocity){
-      console.warn("target undefined - Target, position or linearVelocity is undefined")
+      // console.warn("target undefined - Target, position or linearVelocity is undefined")
       return;
     }
+    // Sets the positon and velocity properties to custom vector2d
+
+    this.linearVelocity = util.fromMatter(this.body.velocity);
+
     switch(this.moveMode){
-      case Steerable.IDLE    : this.idle(); break;
-      case Steerable.SEEK    : this.seek(); break;
-      case Steerable.ARRIVAL : this.arrival(); break;
-      case Steerable.WANDER  : this.wander(); break;
-      case Steerable.PURSUIT : this.pursuit(); break;
-      case Steerable.EVADE   : this.evade(); break;
-      case Steerable.FOLLOW  : this.follow(); break;
+      case steeringSys.IDLE    : this.idle(); break;
+      case steeringSys.SEEK    : this.seek(); break;
+      case steeringSys.ARRIVAL : this.arrival(); break;
+      case steeringSys.WANDER  : this.wander(); break;
+      case steeringSys.PURSUIT : this.pursuit(); break;
+      case steeringSys.EVADE   : this.evade(); break;
+      case steeringSys.FOLLOW  : this.follow(); break;
     }
+
+    // Converts vector2d to matter vector (x and y object) and applies to BODY
+    matterSys.BODY.setVelocity(this.body, util.toMatter(this.linearVelocity))
+
+
   }
   idle(){
     console.log("idle");
   }
   seek(){
     console.log("seek");
+    this.desiredVelocity = this.target.position.clone()
+    this.desiredVelocity.subtract(this.position)
+    this.desiredVelocity.normalise()
+    this.desiredVelocity.scale(this.maxLinearSpeed)
+    this.steering = this.desiredVelocity.clone().subtract(this.linearVelocity)
+    this.steering.scale(this.maxAngularAcceleration).limit(this.maxAngularSpeed)
+    this.linearVelocity.add(this.steering.clone().scale(this.maxLinearAcceleration))
+    this.linearVelocity.limit(this.maxLinearSpeed)
+
   }
   arrival(){
     console.log("arrival");
