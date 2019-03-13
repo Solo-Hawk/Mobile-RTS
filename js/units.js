@@ -66,6 +66,7 @@ var util = {
         return v
     },
     fromMatter: function (matterVector){
+      // console.log(matterVector.x, matterVector.y);
       return util.vector2d(matterVector.x, matterVector.y)
     },
     toMatter: function(vector2d){
@@ -101,6 +102,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
 
+    this.body.collisionFilter.group = -1
 
     this.setScale(0.4)
     matterSys.BODY.scale(this.body, 0.4, 0.4)
@@ -118,9 +120,9 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.target                 = null
     this.orientation            = this.body.angle // In Radians
     this.maxLinearSpeed         = 10;
-    this.maxLinearAcceleration  = 4;
-    this.maxAngularSpeed        = 7;
-    this.maxAngularAcceleration = 3;
+    this.maxLinearAcceleration  = 2;
+    this.maxAngularSpeed        = 1;
+    this.maxAngularAcceleration = 0.2;
 
 
 
@@ -141,6 +143,16 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.moveMode = moveMode
   }
 
+  getLinearVelocity(){
+    var v = util.fromMatter(this.body.velocity);
+    if(v.x == 0 && v.y == 0){
+      v.x = 1;
+      v.y = 1;
+      v.normalise().angleTo(this.rotation)
+    }
+    return v
+  }
+
   update(){
     this.position       = util.fromMatter(this.body.position)
     if(!this.target || !this.target.position || !this.target.linearVelocity){
@@ -149,7 +161,10 @@ class Steerable extends Phaser.GameObjects.Sprite {
     }
     // Sets the positon and velocity properties to custom vector2d
 
-    this.linearVelocity = util.fromMatter(this.body.velocity);
+    this.linearVelocity = this.getLinearVelocity()
+    console.log(this.linearVelocity);
+
+
 
     switch(this.moveMode){
       case steeringSys.IDLE    : this.idle(); break;
@@ -164,21 +179,36 @@ class Steerable extends Phaser.GameObjects.Sprite {
     // Converts vector2d to matter vector (x and y object) and applies to BODY
     matterSys.BODY.setVelocity(this.body, util.toMatter(this.linearVelocity))
 
+    this.rotation = this.linearVelocity.toAngle()
+
 
   }
   idle(){
     console.log("idle");
   }
   seek(){
-    console.log("seek");
-    this.desiredVelocity = this.target.position.clone()
-    this.desiredVelocity.subtract(this.position)
-    this.desiredVelocity.normalise()
-    this.desiredVelocity.scale(this.maxLinearSpeed)
+    // console.log("seek");
+
+    this.desiredVelocity = this.target.position.clone().subtract(this.position).normalise()
+    // console.log(this.linearVelocity);
     this.steering = this.desiredVelocity.clone().subtract(this.linearVelocity)
-    this.steering.scale(this.maxAngularAcceleration).limit(this.maxAngularSpeed)
-    this.linearVelocity.add(this.steering.clone().scale(this.maxLinearAcceleration))
-    this.linearVelocity.limit(this.maxLinearSpeed)
+    // console.log(this.linearVelocity);
+    this.steering.scale(this.maxAngularSpeed)
+    console.log(this.linearVelocity, this.steering);
+    this.linearVelocity.add(this.steering).normalise()
+    // console.log(this.linearVelocity);
+    this.linearVelocity.scale(this.maxLinearSpeed)
+    console.log(this.linearVelocity);
+    // console.log(this.desiredVelocity, this.steering, this.linearVelocity);
+
+    // this.desiredVelocity = this.target.position.clone()
+    // this.desiredVelocity.subtract(this.position)
+    // this.desiredVelocity.normalise()
+    // this.desiredVelocity.scale(this.maxLinearSpeed)
+    // this.steering = this.desiredVelocity.clone().subtract(this.linearVelocity)
+    // this.steering.scale(this.maxAngularAcceleration).limit(this.maxAngularSpeed)
+    // this.linearVelocity.add(this.steering.clone().scale(this.maxLinearAcceleration))
+    // this.linearVelocity.limit(this.maxLinearSpeed)
 
   }
   arrival(){
