@@ -75,10 +75,7 @@ var util = {
 
 }
 
-var matterSys = {
-  BODY: Phaser.Physics.Matter.Matter.Body,
-  VECTOR: Phaser.Physics.Matter.Matter.Vector
-}
+
 
 var steeringSys = {
   IDLE    : 0,
@@ -91,37 +88,39 @@ var steeringSys = {
   FOLLOW  : 7
 }
 
+let UnitMaker = new class{
+  Steerable(scene, x, y, texture, frame, options){
+    var s = new Steerable(scene, x, y, texture, frame, options)
+    return s
+  }
+}
 class Steerable extends Phaser.GameObjects.Sprite {
 
   constructor(scene, x, y, texture, frame, options){
     super(scene, x, y, texture, frame, options)
-    this.debug = {}
 
-    this.scene = scene;
+    this.scene = scene
+    this.scene.add.existing(this)
+    this.scene.impact.add.existing(this)
 
-    scene.matter.add.gameObject(this);
-    scene.add.existing(this);
+    this.body.collides = Phaser.Physics.Impact.COLLIDES.NEVER
 
-    this.body.collisionFilter.group = -1
 
-    this.setScale(0.4)
-    matterSys.BODY.scale(this.body, 0.4, 0.4)
-    //^^^^^^^^^^^^^^^^^^^^^
-    //The core to the custom object
 
-    //NOTICE - THIS ISN'T THE BEST PRACTICE BUT THIS IS BEING DONE FOR THE SAKE OF THE DEVLEOPMENT | IT WILL BE REVIEWED
 
-    this.moveMode = Steerable.IDLE;
+    this.moveMode = steeringSys.ARRIVAL;
 
-    this.position               = util.fromMatter(this.body.position)
-    this.linearVelocity         = util.fromMatter(this.body.velocity)
+    this.body.pos = util.vector2d(this.body.pos.x, this.body.pos.y)
+    this.position               = this.body.pos
+    this.body.vel = util.vector2d(0,0)
+    this.linearVelocity         = this.body.vel
     this.desiredVelocity        = util.vector2d(0,0)
     this.steering               = util.vector2d(0,0)
     this.target                 = null
     this.orientation            = this.body.angle // In Radians
-    this.maxLinearSpeed         = 10;
-    this.maxLinearAcceleration  = 2;
-    this.maxAngularSpeed        = 1;
+    this.maxLinearSpeed         = 300;
+    this.maxLinearAcceleration  = 200;
+    this.maxAngularSpeed        = 4;
     this.maxAngularAcceleration = 0.2;
 
 
@@ -134,7 +133,27 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.wanderPos    = util.vector2d(0,0);
     this.wanderForce  = util.vector2d(0,0);
     console.log(this);
+
+
   }
+
+  getPosition(){
+    return this.position.clone()
+  }
+
+  getLinearVelocity(){
+    return this.linearVelocity.clone()
+  }
+
+  setLinearVelocity(vel){
+    this.linearVelocity.x = vel.x
+    this.linearVelocity.y = vel.y
+  }
+  addLinearVelocity(vel){
+    this.linearVelocity.x += vel.x
+    this.linearVelocity.y += vel.y
+  }
+
   setTarget(target){
     this.target = target
   }
@@ -143,88 +162,51 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.moveMode = moveMode
   }
 
-  getLinearVelocity(){
-    var v = util.fromMatter(this.body.velocity);
-    if(v.x == 0 && v.y == 0){
-      v.x = 1;
-      v.y = 1;
-      v.normalise().angleTo(this.rotation)
-    }
-    return v
-  }
-
   update(){
-    this.position       = util.fromMatter(this.body.position)
-    if(!this.target || !this.target.position || !this.target.linearVelocity){
-      // console.warn("target undefined - Target, position or linearVelocity is undefined")
-      return;
-    }
-    // Sets the positon and velocity properties to custom vector2d
-
-    this.linearVelocity = this.getLinearVelocity()
-    console.log(this.linearVelocity);
-
-
-
     switch(this.moveMode){
       case steeringSys.IDLE    : this.idle(); break;
-      case steeringSys.SEEK    : this.seek(); break;
-      case steeringSys.ARRIVAL : this.arrival(); break;
+      case steeringSys.SEEK    : this.seek(this.target, 0); break;
+      case steeringSys.ARRIVAL : this.seek(this.target, 50); break;
       case steeringSys.WANDER  : this.wander(); break;
       case steeringSys.PURSUIT : this.pursuit(); break;
       case steeringSys.EVADE   : this.evade(); break;
       case steeringSys.FOLLOW  : this.follow(); break;
     }
-
-    // Converts vector2d to matter vector (x and y object) and applies to BODY
-    matterSys.BODY.setVelocity(this.body, util.toMatter(this.linearVelocity))
-
-    this.rotation = this.linearVelocity.toAngle()
-
+    this.setRotation(this.linearVelocity.toAngle())
 
   }
   idle(){
-    console.log("idle");
+
   }
-  seek(){
-    // console.log("seek");
-
-    this.desiredVelocity = this.target.position.clone().subtract(this.position).normalise()
-    // console.log(this.linearVelocity);
-    this.steering = this.desiredVelocity.clone().subtract(this.linearVelocity)
-    // console.log(this.linearVelocity);
-    this.steering.scale(this.maxAngularSpeed)
-    console.log(this.linearVelocity, this.steering);
-    this.linearVelocity.add(this.steering).normalise()
-    // console.log(this.linearVelocity);
-    this.linearVelocity.scale(this.maxLinearSpeed)
-    console.log(this.linearVelocity);
-    // console.log(this.desiredVelocity, this.steering, this.linearVelocity);
-
-    // this.desiredVelocity = this.target.position.clone()
-    // this.desiredVelocity.subtract(this.position)
-    // this.desiredVelocity.normalise()
-    // this.desiredVelocity.scale(this.maxLinearSpeed)
-    // this.steering = this.desiredVelocity.clone().subtract(this.linearVelocity)
-    // this.steering.scale(this.maxAngularAcceleration).limit(this.maxAngularSpeed)
-    // this.linearVelocity.add(this.steering.clone().scale(this.maxLinearAcceleration))
-    // this.linearVelocity.limit(this.maxLinearSpeed)
-
+  seek(target, radius){
+    var force = util.vector2d(0,0)
+    var distance;
+    this.desiredVelocity = target.clone().subtract(this.getPosition())
+    distance = this.desiredVelocity.length()
+    this.desiredVelocity.normalise();
+    if (distance <= radius){
+      this.desiredVelocity.scale(this.maxLinearSpeed * distance/radius)
+      console.log(this.maxLinearSpeed * distance/radius);
+    } else {
+      this.desiredVelocity.scale(this.maxLinearSpeed)
+      this.desiredVelocity.truncate(this.maxAngularSpeed)
+    }
+    this.addLinearVelocity(this.desiredVelocity)
   }
   arrival(){
-    console.log("arrival");
+
   }
   wander(){
-    console.log("wander");
+
   }
   pursuit(){
-    console.log("pursuit");
+
   }
   evade(){
-    console.log("evade");
+
   }
   follow(){
-    console.log("follow");
+
   }
 
 }

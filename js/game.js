@@ -5,13 +5,12 @@ var config = {
   height: 412,
   pixelArt: false,
   physics: {
-    default: 'matter',
-    matter:{
+    default: 'impact',
+    impact:{
       debug: true,
-      gravity:{
-        x:0,
-        y:0
-      }
+      gravity: 0,
+      timeScale: 1,
+      setBounds: false
     }
   },
   scene: [SceneLoader, SceneMenu, SceneLevelDevelopment],
