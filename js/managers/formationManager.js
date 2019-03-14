@@ -32,15 +32,19 @@ class Formation{
     return util.vector2d(pos.x, pos.y)
   }
   organise(){
+    this.units.forEach((unit)=>{unit.formation = this}, this)
     var toSort = this.units
     toSort.splice(toSort.indexOf(this.flagship),1)
     this.ring.units = toSort;
-    this.units.forEach((unit)=>{unit.formation = this}, this)
+
   }
   update(){
     var ring = this.generateRing(this.getFlagshipPos(), this.ring.units.length, this.ring.radius)
     for(var i = 0; i < this.ring.units.length; i++){
       this.ring.units[i].setObjective(ring[i])
+    }
+    if(this.flagship.objective.distanceFrom(this.getFlagshipPos()) < 20){
+      this.setObjective(new HOLD())
     }
   }
   generateRing(pos, count, radius){
@@ -68,11 +72,29 @@ class Formation{
 class Objective{
   constructor(x, y){
     this.position = util.vector2d(x,y)
+    this.action = commands.HOLD
+  }
+  distanceFrom(pos){
+    return pos.clone().add(this.position).length()
+  }
+}
+class Hold extends Objective{
+  constructor(){
+    super(0,0)
+    this.action = commands.MOVE
+
   }
 }
 class MoveTo extends Objective{
   constructor(x,y){
     super(x,y)
+    this.action = commands.MOVE
 
+  }
+}
+class Attack extends Objective{
+  constructor(x,y){
+    super(x,y)
+    this.action = commands.ATTACK
   }
 }
