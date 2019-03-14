@@ -25,6 +25,7 @@ class Formation{
     })
   }
   setObjective(objective){
+    console.log("objective called");
     this.flagship.setObjective(objective)
   }
   getFlagshipPos(){
@@ -43,8 +44,11 @@ class Formation{
     for(var i = 0; i < this.ring.units.length; i++){
       this.ring.units[i].setObjective(ring[i])
     }
-    if(this.flagship.objective.distanceFrom(this.getFlagshipPos()) < 20){
-      this.setObjective(new HOLD())
+    console.log(this.flagship.objective.distanceFrom(this.getFlagshipPos()));
+    var pos = this.getFlagshipPos()
+    if(this.flagship.objective.distanceFrom(pos) < 20 && this.flagship.objective.action != commands.HOLD){
+      console.log("OBJECTIVE REACHED");
+      this.setObjective(new Hold(pos.x,pos.y))
     }
   }
   generateRing(pos, count, radius){
@@ -75,13 +79,15 @@ class Objective{
     this.action = commands.HOLD
   }
   distanceFrom(pos){
-    return pos.clone().add(this.position).length()
+    return pos.clone().subtract(this.position).length()
   }
 }
 class Hold extends Objective{
-  constructor(){
-    super(0,0)
-    this.action = commands.MOVE
+  constructor(x,y){
+    x = x || 0
+    y = y || 0
+    super(x,y)
+    this.action = commands.HOLD
 
   }
 }

@@ -222,8 +222,12 @@ class Steerable extends Phaser.GameObjects.Sprite {
       }
     }
   }
+  idle(){
+    this.seek(this.objective.position, 100, 20)
+  }
 
-  seek(target, radius){
+  seek(target, radius, brace){
+    brace = brace || 0
 
       this.rotationLock = true
     var force = util.vector2d(0,0)
@@ -231,9 +235,9 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.desiredVelocity = target.clone().subtract(this.getPosition())
     distance = this.desiredVelocity.length()
     this.desiredVelocity.normalise();
-    if (distance <= radius){
+    if (distance <= radius - brace){
 
-      this.desiredVelocity.scale(this.maxLinearSpeed * (distance)/radius)
+      this.desiredVelocity.scale(this.maxLinearSpeed * (distance)/(radius - brace))
       this.steering = this.desiredVelocity.clone().subtract(this.linearVelocity)
       this.steering.truncate(this.maxAngularSpeed * 3)
       // console.log(this.maxLinearSpeed * distance/radius);

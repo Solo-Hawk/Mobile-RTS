@@ -15,8 +15,11 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
       this.formation = new Formation([this.units[0], this.units[1],this.units[2],this.units[3]])
       this.formation.setObjective(new MoveTo(Math.random() * 800, Math.random() * 400))
-      setInterval((scene) => {scene.formation.setObjective(new MoveTo(Math.random() * 800, Math.random() * 400))},
-      10000, 
+      setInterval((scene) => {
+        console.log("Timer Set");
+        scene.formation.setObjective(new MoveTo(Math.random() * 800, Math.random() * 400))
+      },
+      20000,
       this)
   }
   update(delta,time){
