@@ -16,7 +16,7 @@ class Formation{
 
   }
   addUnits(units){
-    this.units.add
+    this.units.concat(units)
     this.organise()
   }
   removeUnits(units){
@@ -26,11 +26,12 @@ class Formation{
   }
   setObjective(objective){
     console.log("objective called");
+    console.log(objective);
     this.flagship.setObjective(objective)
   }
   getFlagshipPos(){
     var pos = this.flagship.getPosition()
-    return util.vector2d(pos.x, pos.y)
+    return gametools.utils.vector.vector2d(pos.x, pos.y)
   }
   organise(){
     this.units.forEach((unit)=>{unit.formation = this}, this)
@@ -44,19 +45,19 @@ class Formation{
     for(var i = 0; i < this.ring.units.length; i++){
       this.ring.units[i].setObjective(ring[i])
     }
-    console.log(this.flagship.objective.distanceFrom(this.getFlagshipPos()));
     var pos = this.getFlagshipPos()
-    if(this.flagship.objective.distanceFrom(pos) < 20 && this.flagship.objective.action != commands.HOLD){
+    if(this.flagship.objective.distanceFrom(pos) < 20 && this.flagship.objective.action !=gametools.statics.commands.HOLD){
       console.log("OBJECTIVE REACHED");
-      this.setObjective(new Hold(pos.x,pos.y))
+      var objPos = this.flagship.objective.position
+      this.setObjective(new Hold(objPos.x,objPos.y))
     }
   }
   generateRing(pos, count, radius){
     var rot = (360 * Math.PI/180) / count;
     var ring = []
     for(var i = 0; i < count; i++){
-      var unitPos = util.vector2d(pos.x, pos.y)
-      var ringShift = util.vector2d(radius,0)
+      var unitPos = gametools.utils.vector.vector2d(pos.x, pos.y)
+      var ringShift = gametools.utils.vector.vector2d(radius,0)
       ringShift.angleTo(this.flagship.rotation + (rot*i))
       unitPos.add(ringShift)
       ring.push(new MoveTo(unitPos.x, unitPos.y))
@@ -75,8 +76,8 @@ class Formation{
 
 class Objective{
   constructor(x, y){
-    this.position = util.vector2d(x,y)
-    this.action = commands.HOLD
+    this.position = gametools.utils.vector.vector2d(x,y)
+    this.action = gametools.statics.commands.HOLD
   }
   distanceFrom(pos){
     return pos.clone().subtract(this.position).length()
@@ -87,20 +88,20 @@ class Hold extends Objective{
     x = x || 0
     y = y || 0
     super(x,y)
-    this.action = commands.HOLD
+    this.action = gametools.statics.commands.HOLD
 
   }
 }
 class MoveTo extends Objective{
   constructor(x,y){
     super(x,y)
-    this.action = commands.MOVE
+    this.action = gametools.statics.commands.MOVE
 
   }
 }
 class Attack extends Objective{
   constructor(x,y){
     super(x,y)
-    this.action = commands.ATTACK
+    this.action =gametools.statics.commands.ATTACK
   }
 }

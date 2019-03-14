@@ -1,8 +1,8 @@
 
 var config = {
   type: Phaser.AUTO,
-  width: 824,
-  height: 412,
+  width: 824, //824
+  height: 412, //412
   pixelArt: false,
   physics: {
     default: 'impact',
