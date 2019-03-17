@@ -1,11 +1,13 @@
 class GameManager{
 
-  constructor(scene){
-    this.scene = scene
+  constructor(gameScene, gameInterface){
+    this.game = gameScene
+    this.gameInterface = gameInterface
     this.units = []
     this.formations = []
     this.add = {
       unit:new class{
+
         Steerable(scene, x, y, texture, frame, options){
           var s = new Steerable(scene, x, y, texture, frame, options)
           scene.gameManager.addUnits([s])
@@ -29,6 +31,7 @@ class GameManager{
       },
       formation: new class{
         Formation(scene, units){
+          console.log(scene);
           var f = new Formation(units)
           scene.gameManager.addFormation(f)
           return f

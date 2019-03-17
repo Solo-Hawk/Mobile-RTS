@@ -35,13 +35,12 @@ class Formation{
   }
   organise(){
     this.units.forEach((unit)=>{unit.formation = this}, this)
-    var toSort = this.units
+    var toSort = Array.from(this.units)
     toSort.splice(toSort.indexOf(this.flagship),1)
     this.ring.units = toSort;
-
   }
   update(){
-    var ring = this.generateRing(this.getFlagshipPos(), this.ring.units.length, this.ring.radius)
+    var ring = this.generateRing(this.flagship, this.ring.units.length, this.ring.radius)
     for(var i = 0; i < this.ring.units.length; i++){
       this.ring.units[i].setObjective(ring[i])
     }
@@ -52,9 +51,11 @@ class Formation{
       this.setObjective(new Hold(objPos.x,objPos.y))
     }
   }
-  generateRing(pos, count, radius){
+  generateRing(flagship, count, radius){
     var rot = (360 * Math.PI/180) / count;
     var ring = []
+    var pos = flagship.position.clone()
+    pos.add(flagship.linearVelocity)
     for(var i = 0; i < count; i++){
       var unitPos = gametools.utils.vector.vector2d(pos.x, pos.y)
       var ringShift = gametools.utils.vector.vector2d(radius,0)
@@ -67,8 +68,9 @@ class Formation{
 
   findFlagship(){
     for(var i = 0; i < this.units.length; i++){
+      console.log(this.units[i].rating);
       if(this.units[i].rating > this.flagship.rating){
-        this.centralUnit = units[i]
+        this.flagship = this.units[i]
       }
     }
   }
