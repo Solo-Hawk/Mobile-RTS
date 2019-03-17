@@ -132,7 +132,6 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.desiredVelocity.normalise()
 
     if (distance <= radius){
-      console.log("Adjusting");
       this.desiredVelocity.scale(this.maxLinearSpeed * (distance / radius))
     }else{
       this.desiredVelocity.scale(this.maxLinearSpeed)
@@ -141,7 +140,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     if(distance <= radius / 2) this.rotationLock = false
     this.force = this.desiredVelocity.subtract(this.linearVelocity)
 
-    this.linearVelocity.add(this.force)
+    this.addLinearVelocity(this.force)
   }
 
   flee(){

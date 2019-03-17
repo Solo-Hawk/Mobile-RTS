@@ -39,6 +39,7 @@ class Formation{
     toSort.splice(toSort.indexOf(this.flagship),1)
     this.ring.units = toSort;
   }
+
   update(){
     var ring = this.generateRing(this.flagship, this.ring.units.length, this.ring.radius)
     for(var i = 0; i < this.ring.units.length; i++){

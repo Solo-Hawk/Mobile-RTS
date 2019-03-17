@@ -12,7 +12,8 @@ class GameInterface extends Phaser.Scene{
 
   }
   create(){
-    this.createButtons.call(this)
+    // this.createButtons.call(this)
+    this.createFactoryButtons.call(this)
 
     this.slowUnits = 0
     this.fastUnits = 0
@@ -20,6 +21,20 @@ class GameInterface extends Phaser.Scene{
 
 
     console.log(this);
+
+  }
+
+  createFactoryButtons(){
+    var textStyle = {
+      fontSize: '32px',
+      fontFamily: 'MS Gothic',
+      color: '#ffffff',
+      align: 'center',
+      backgroundColor: '#ff00ff'
+    }
+    console.log(this.game.canvas.height);
+    var activator = this.add.circle(0, this.game.canvas.height/2, 50, 0x6200EE).setDepth(10)
+
 
   }
 
