@@ -1,17 +1,16 @@
 
 var config = {
   type: Phaser.AUTO,
-  width: 824,
-  height: 412,
+  width: 1600, //824
+  height: 800, //412
   pixelArt: false,
   physics: {
-    default: 'matter',
-    matter:{
+    default: 'impact',
+    impact:{
       debug: true,
-      gravity:{
-        x:0,
-        y:0
-      }
+      gravity: 0,
+      timeScale: 1,
+      setBounds: false
     }
   },
   scene: [SceneLoader, SceneMenu, SceneLevelDevelopment],

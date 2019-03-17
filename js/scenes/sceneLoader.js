@@ -3,6 +3,7 @@ class SceneLoader extends Phaser.Scene{
     super("loader")
   }
   preload(){
+    {
     console.log(this);
     // All Main Assets are loaded here
     var progressBar = this.add.graphics();
@@ -67,7 +68,7 @@ class SceneLoader extends Phaser.Scene{
         assetText.destroy();
         this.scene.switch("mainmenu")
     }, this);
-
+  }
     this.load.image('red1', 'assets/ship_red_1.png');
     this.load.image('blue1', 'assets/ship_blue_1.png');
   }
