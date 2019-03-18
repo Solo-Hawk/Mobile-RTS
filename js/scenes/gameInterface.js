@@ -12,16 +12,21 @@ class GameInterface extends Phaser.Scene{
 
   }
   create(){
-    // this.createButtons.call(this)
+    this.createButtons.call(this)
     this.createFactoryButtons.call(this)
 
     this.slowUnits = 0
     this.fastUnits = 0
+    this.team = 0
 
 
 
     console.log(this);
 
+  }
+
+  updateMenu(focus){
+    console.log("MENU UPDATE", focus);
   }
 
   createFactoryButtons(){
@@ -50,25 +55,30 @@ class GameInterface extends Phaser.Scene{
     var suS = this.add.text(155,50 ,"-", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {this.slowUnits = this.slowUnits <= 0 ? this.slowUnits: this.slowUnits - 1; suC.setText(this.slowUnits)});
     var suB = this.add.text(10, 10,"Slow Units", textStyle);
     var suC = this.add.text(85, 50,"0" , textStyle)
-    var fuA = this.add.text(10, 130,"+", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {this.fastUnits++; fuC.setText(this.fastUnits)});;
+    var fuA = this.add.text(10, 130,"+", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {this.fastUnits++; fuC.setText(this.fastUnits)});
     var fuS = this.add.text(155,130,"-", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {this.fastUnits = this.fastUnits <= 0 ? this.fastUnits: this.fastUnits - 1; fuC.setText(this.fastUnits)});;
     var fuB = this.add.text(10, 90,"Fast Units", textStyle);
     var fuC = this.add.text(85, 130,"0", textStyle);
-    var cfB = this.add.text(50, 170, "Create", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {
+    var tsA = this.add.text(10, 210,"+", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {this.team++; tsC.setText(this.team)});
+    var tsS = this.add.text(155,210,"-", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {this.team = this.team <= 0 ? this.team: this.team - 1; tsC.setText(this.team)});;
+    var tsB = this.add.text(10, 170,"Team", textStyle);
+    var tsC = this.add.text(85, 210,"0", textStyle);
+    var cfB = this.add.text(50, 250, "Create", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {
       var units = []
       for(var i = 0; i < this.slowUnits; i++){
-        units.push(this.gameScene.gameManager.add.unit.SlowUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, 'red1'));
+        units.push(this.gameScene.gameManager.factory.add.BaseUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, 'red1',this.team));
       }
       for(var i = 0; i < this.fastUnits; i++){
-        units.push(this.gameScene.gameManager.add.unit.FastUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, 'blue1'));
+        units.push(this.gameScene.gameManager.factory.add.BaseUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, 'blue1',this.team));
       }
-      var formation = this.gameScene.gameManager.add.formation.Formation(this.gameScene, units)
-      formation.setObjective(new MoveTo(Math.random() * 1600, Math.random() * 800))
+      var formation = this.gameScene.gameManager.factory.add.Formation(units)
+      formation.flagship.setObjective(new Objective(Math.random() * 1600, Math.random() * 800, gametools.statics.commands.MOVE))
       setInterval((formation) => {
-        formation.setObjective(new MoveTo(Math.random() * 1600, Math.random() * 800))
+        formation.flagship.setObjective(new Objective(Math.random() * 1600, Math.random() * 800, gametools.statics.commands.MOVE))
       },
       12000,
       formation)
+      formation.refresh()
     })
     // var fuA = this.add.text(10,50,"+",textStyle );
     // var fuS = this.add.text(210,50,"-",textStyle );

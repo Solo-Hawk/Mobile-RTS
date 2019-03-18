@@ -1,76 +1,45 @@
 class GameManager{
-
-  constructor(gameScene, gameInterface){
-    this.game = gameScene
-    this.gameInterface = gameInterface
+  constructor(gameScene, uiScene){
+    console.log(gameScene, uiScene);
+    this.gameScene = gameScene
+    this.uiScene = uiScene
     this.units = []
     this.formations = []
-    this.add = {
-      unit:new class{
-
-        Steerable(scene, x, y, texture, frame, options){
-          var s = new Steerable(scene, x, y, texture, frame, options)
-          scene.gameManager.addUnits([s])
-          return s
+    this.factory = {
+      add: new class{
+        constructor(){
+          this.gameManager;
         }
-        BaseUnit(scene, x, y, texture, frame, options){
-          var u = new BaseUnit(scene, x, y, texture, frame, options)
-          scene.gameManager.addUnits([u])
-          return u
+        setManager(gameManager){
+          this.gameManager = gameManager
         }
-        SlowUnit(scene, x, y, texture, frame, options){
-          var u = new SlowUnit(scene, x, y, texture, frame, options)
-          scene.gameManager.addUnits([u])
-          return u
+        Formation(units, leader, team){
+          var formation = new Formation(this.gameManager, units, leader, team)
+          this.gameManager.formations.push(formation)
+          return formation
         }
-        FastUnit(scene, x, y, texture, frame, options){
-          var u = new FastUnit(scene, x, y, texture, frame, options)
-          scene.gameManager.addUnits([u])
-          return u
-        }
-      },
-      formation: new class{
-        Formation(scene, units){
+        BaseUnit(scene, x, y, texture, team, formation, objective){
           console.log(scene);
-          var f = new Formation(units)
-          scene.gameManager.addFormation(f)
-          return f
+          var u = new BaseUnit(this.gameManager, scene,x,y,texture,team, formation, objective)
+          this.gameManager.units.push(u)
+          return u
         }
       }
-  }
-
-  }
-
-  createUnit(){
-
-  }
-  createFormation(){
-
-  }
-  addUnits(units){
-    this.units = this.units.concat(units)
-  }
-  removeUnit(unit){
-    if(unit.formation){
-      unit.formation.removeUnit(unit)
     }
-    this.units.splice(this.units.indexOf(unit),1)
+    this.factory.add.setManager(this)
   }
-  createFormation(){
 
+  getNearestFormation(formation,distance){
+    for(var i = 0; i < this.formations.length; i++){
+      if(this.formations[i] != formation && this.formations[i] != formation.team){
+        return this.formations[i]
+      }
+    }
   }
-  addFormation(formation){
-    this.formations = this.formations.concat(formation)
-  }
-  getFormation(unit){
 
-  }
-  removeFormation(formation){
 
-  }
   update(){
     this.formations.forEach((formation)=>{formation.update()})
-    this.units.forEach((unit)=>{unit.update();})
+    this.units.forEach((unit)=>{unit.update()})
   }
-
 }

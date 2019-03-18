@@ -6,11 +6,10 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
   }
   create(){
-    var gameInterface = this.scene.add("game-interface",new GameInterface(), false, this)
+    this.scene.add("game-interface",new GameInterface(), false, this)
     this.scene.run("game-interface")
-
+    var gameInterface = this.scene.get("game-interface")
     this.gameManager = new GameManager(this, gameInterface)
-
     console.log(this);
 
 
@@ -18,7 +17,6 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
 
   update(delta,time){
-    // console.log(time);
     this.gameManager.update()
 
   }

@@ -36,7 +36,7 @@ var gametools = {
                   return Math.sqrt((this.x * this.x) + (this.y * this.y));
               },
               rotate: function (a) {
-                  var angle = (this.toAngle() * 180 / Math.PI) + a
+                  var angle = this.toAngle() + a
                   this.angleTo(angle);
                   return this;
               },
@@ -66,6 +66,20 @@ var gametools = {
           }
           return v
       }
+    },
+    formator:{
+      T:(count, spacing, pos, facing)=>{
+        var placements = []
+        var length = spacing * (count - 1)
+        for(var i = 0; i < count; i++){
+          var vector = gametools.utils.vector.vector2d((spacing*i) -(length/2), spacing)
+          vector.rotate(facing + Phaser.Math.DegToRad(-90))
+          vector.add(pos)
+          placements.push(vector)
+        }
+        return placements
+
+      }
     }
 
 
@@ -85,6 +99,16 @@ var gametools = {
       HOLD   : 0,
       MOVE   : 1,
       ATTACK : 2
+    },
+    formations:{
+      T      : 0,
+      DELTA  : 1,
+      LEADER : 2,
+      TWIN   : 3,
+      EAGLE  : 4,
+      VIC    : 5,
+      VULCAN : 6
+
     },
     teams:{
       NEUTRAL : 0,

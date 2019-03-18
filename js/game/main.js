@@ -13,6 +13,10 @@ var config = {
       setBounds: false
     }
   },
+  fps: {
+    min: 15,
+    target: 30,
+  },
   scene: [SceneLoader, SceneMenu, SceneLevelDevelopment],
   plugins: {
     scene: [
