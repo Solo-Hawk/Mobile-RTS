@@ -1,6 +1,7 @@
 class Formation{
   constructor(gameManager, units, flagship, team){
     console.log(units, flagship);
+    this.type = "formation"
     this.team = team || gametools.statics.teams.NEUTRAL
     this.gameManager = gameManager;
     this.units = units || []
@@ -24,12 +25,19 @@ class Formation{
     this.setFlagship()
   }
   removeUnit(unit){
+    console.log("REMOVING UNIT");
+    console.log(this.units);
     this.units.splice(this.units.indexOf(unit),1)
+    console.log(this.units);
     this.setFlagship()
   }
 
   refresh(){
-    this.units.forEach((unit)=>{if(unit.formation != this && unit.formation != undefined){unit.setFormation(this)}},this)
+    this.units.forEach((unit)=>{
+      if(unit.formation != this){
+        unit.setFormation(this)
+      }
+    },this)
   }
 
   setFlagship(){
@@ -48,8 +56,10 @@ class Formation{
     this.children.splice(this.children.indexOf(this.flagship),1)
 
     console.log(this.children);
+    if(this.team == gametools.statics.teams.PLAYER){
+      this.flagship.setInteractive({useHandCursor:true}).on('pointerdown', () => {this.gameManager.uiScene.updateMenu(this.flagship.formation)})
+    }
 
-    this.flagship.setInteractive({useHandCursor:true}).on('pointerdown', () => {this.gameManager.uiScene.updateMenu(this)})
   }
 
 
@@ -60,7 +70,7 @@ class Formation{
     }
 
     if(this.gameManager.gameScene.time.now - this.lastcheck > this.checkInterval){
-      var attackTarget = this.gameManager.getNearestFormation(this, 400)
+      var attackTarget = this.gameManager.getNearestFormation(this, this.flagship.range)
       if(attackTarget){
         console.log(attackTarget);
       }

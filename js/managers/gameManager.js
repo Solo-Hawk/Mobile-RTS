@@ -32,14 +32,15 @@ class GameManager{
   getNearestFormation(formation,distance){
     for(var i = 0; i < this.formations.length; i++){
       if(this.formations[i] != formation && this.formations[i] != formation.team){
-        return this.formations[i]
+        var length = formation.flagship.getPosition().subtract(this.formations[i].flagship.getPosition()).length()
+        if(length <= distance){return this.formations[i]}
       }
     }
   }
 
 
   update(){
-    this.formations.forEach((formation)=>{formation.update()})
+    this.formations.forEach((formation)=>{formation.refresh();formation.update()})
     this.units.forEach((unit)=>{unit.update()})
   }
 }

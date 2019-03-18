@@ -8,11 +8,15 @@ class Steerable extends Phaser.GameObjects.Sprite {
 
     this.scene = scene
     this.scene.add.existing(this)
+
+    this.setOrigin(0.5, 0.5)
     this.scene.impact.add.existing(this)
 
     this.body.collides = Phaser.Physics.Impact.COLLIDES.NEVER
 
     this.moveMode = gametools.statics.steeringBehaviours.ARRIVAL;
+
+
 
 
     this.objective = objective || new Objective(x,y)
@@ -146,7 +150,8 @@ class Steerable extends Phaser.GameObjects.Sprite {
 
 class BaseUnit extends Steerable{
   constructor(gameManager,scene, x, y, texture, team, formation){
-    super(gameManager,scene, x, y, texture, team)
+    super(gameManager,scene, x, y, texture)
+    this.type = "unit"
     this.rating = 4;
     this.health = 1
     this.range = 800;
@@ -178,6 +183,7 @@ class BaseUnit extends Steerable{
           this.formation.flagship.rotation,
           0.015
         ))
+
       }else{
         this.setRotation(Phaser.Math.Angle.RotateTo(
           this.rotation,

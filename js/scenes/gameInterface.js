@@ -6,6 +6,16 @@ class GameInterface extends Phaser.Scene{
       this.gameScene = gameScene
       console.log("Init");
       console.log(gameScene);
+      this.focus = null
+      this.elements = []
+      this.components = []
+      this.textStyle = {
+        fontSize: '48px',
+        fontFamily: 'MS Gothic',
+        color: '#ffffff',
+        align: 'center',
+        backgroundColor: '#ff00ff'
+      }
   }
 
   preload(){
@@ -19,14 +29,78 @@ class GameInterface extends Phaser.Scene{
     this.fastUnits = 0
     this.team = 0
 
+    this.touchStartX;
+    this.touchStartY;
+    this.touchEndX;
+    this.touchEndY;
+
 
 
     console.log(this);
+    this.input.on('pointerdown', function(pointer){
+      console.log("POinter Down");
+      this.touchStartX = pointer.x
+      this.touchStartY = pointer.y
+      if(this.focus.type != null && this.focus.type != undefined){
+        if(this.focus.type == "formation"){
+          console.log("Focus is formation");
+        }
+      }
+    }, this)
+
+    this.input.on('pointerup', function(pointer){
+      console.log("Pointer Up");
+      this.touchEndX = pointer.x;
+      this.touchEndY = pointer.y;
+      if(this.focus.type != null && this.focus.type != undefined){
+        if(this.focus.type == "formation"){
+          console.log("Focus is formation");
+        }
+      }
+    })
+
+  }
+  update(){
+    this.elements.forEach((element)=>{element.destroy()})
+    if(this.focus){
+      if(this.focus.type == "formation"){
+        var flagPos = this.focus.flagship.position
+        var circle = this.gameScene.add.circle(flagPos.x, flagPos.y, 70, 0xffffff, 0)
+        circle.setOrigin(-0.1,-0.1)
+        circle.setStrokeStyle(7, 0x0000ff, 1)
+        this.elements.push(circle)
+        this.focus.children.forEach((unit)=>{
+            var unitPos = unit.position
+            var unitCircle = this.gameScene.add.circle(unitPos.x, unitPos.y, 50, 0xffffff, 0)
+            unitCircle.setOrigin(-0.4,-0.4)
+            unitCircle.setStrokeStyle(7, 0x00ff00, 1)
+            this.elements.push(unitCircle)
+
+        },this)
+
+      }
+    }
 
   }
 
   updateMenu(focus){
+    this.focus = focus
     console.log("MENU UPDATE", focus);
+    var button = this.add.text(1350, 10 ,"Deselect", this.textStyle)
+    button.setInteractive({useHandCursor:true}).on('pointerdown', () => {this.clearComponents(); this.focus = undefined; button.destroy()});
+    if(focus.type = "formation"){
+      this.scene
+      // this.createControlPanel(focus)
+    }
+
+
+  }
+  clearComponents(){
+    this.components.forEach((comp)=>{comp.destroy()})
+  }
+  createControlPanel(focus){
+    var image = this.add.image(300, 720, this.focus.flagship.texture.key).setDepth(1000)
+    var box = this.add.rectangle(800, 700, 1200, 200, 0xAA00FF)
   }
 
   createFactoryButtons(){
@@ -66,10 +140,10 @@ class GameInterface extends Phaser.Scene{
     var cfB = this.add.text(50, 250, "Create", textStyle).setInteractive({useHandCursor:true}).on('pointerdown', () => {
       var units = []
       for(var i = 0; i < this.slowUnits; i++){
-        units.push(this.gameScene.gameManager.factory.add.BaseUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, 'red1',this.team));
+        units.push(this.gameScene.gameManager.factory.add.BaseUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, this.team + "Heavy",this.team));
       }
       for(var i = 0; i < this.fastUnits; i++){
-        units.push(this.gameScene.gameManager.factory.add.BaseUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, 'blue1',this.team));
+        units.push(this.gameScene.gameManager.factory.add.BaseUnit(this.gameScene, Math.random() * 1600, Math.random() * 800, this.team + "Light",this.team));
       }
       var formation = this.gameScene.gameManager.factory.add.Formation(units)
       formation.flagship.setObjective(new Objective(Math.random() * 1600, Math.random() * 800, gametools.statics.commands.MOVE))
