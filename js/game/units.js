@@ -205,3 +205,24 @@ class BaseUnit extends Steerable{
   }
 
 }
+
+class SlowUnit extends BaseUnit{
+  constructor(gameManager,scene, x, y, texture, team, formation){
+    super(gameManager,scene, x, y, texture, team, formation)
+    this.rating = 40;
+    this.maxLinearSpeed = 50
+    this.maxLinearAcceleration = 30
+    this.maxAngularSpeed = 2
+    this.maxAngularAcceleration = 1
+  }
+}
+class FastUnit extends BaseUnit{
+  constructor(gameManager,scene, x, y, texture, team, formation){
+    super(gameManager,scene, x, y, texture, team, formation)
+    this.rating = 10;
+    this.maxLinearSpeed = 150
+    this.maxLinearAcceleration = 80
+    this.maxAngularSpeed = 6
+    this.maxAngularAcceleration = 5
+  }
+}

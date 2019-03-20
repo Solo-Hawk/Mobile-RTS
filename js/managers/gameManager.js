@@ -24,6 +24,18 @@ class GameManager{
           this.gameManager.units.push(u)
           return u
         }
+        SlowUnit(scene, x, y, texture, team, formation, objective){
+          console.log(scene);
+          var u = new SlowUnit(this.gameManager, scene,x,y,texture,team, formation, objective)
+          this.gameManager.units.push(u)
+          return u
+        }
+        FastUnit(scene, x, y, texture, team, formation, objective){
+          console.log(scene);
+          var u = new FastUnit(this.gameManager, scene,x,y,texture,team, formation, objective)
+          this.gameManager.units.push(u)
+          return u
+        }
       }
     }
     this.factory.add.setManager(this)

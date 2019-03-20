@@ -1,13 +1,13 @@
 
 var config = {
   type: Phaser.AUTO,
-  width: 1600, //824
-  height: 800, //412
+  width: 1400, //824
+  height: 564, //412
   pixelArt: false,
   physics: {
     default: 'impact',
     impact:{
-      debug: true,
+      debug: false,
       gravity: 0,
       timeScale: 1,
       setBounds: false
