@@ -69,8 +69,11 @@ class SceneLoader extends Phaser.Scene{
         this.scene.switch("mainmenu")
     }, this);
   }
-    this.load.image('red1', 'assets/ship_red_1.png');
-    this.load.image('blue1', 'assets/ship_blue_1.png');
+
+    this.load.image('1Heavy', 'assets/ship_blue_heavy.png');
+    this.load.image('2Heavy', 'assets/ship_red_heavy.png');
+    this.load.image('1Light', 'assets/ship_blue_light.png');
+    this.load.image('2Light', 'assets/ship_red_light.png');
   }
   create(){
 

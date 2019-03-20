@@ -3,19 +3,23 @@ console.log("Steerable Class - Loaded");
 
 class Steerable extends Phaser.GameObjects.Sprite {
 
-  constructor(scene, x, y, texture, frame, options){
-    super(scene, x, y, texture, frame, options)
+  constructor(gameManager, scene, x, y, texture, objective){
+    super(scene, x, y, texture)
 
     this.scene = scene
     this.scene.add.existing(this)
+
+    this.setOrigin(0.5, 0.5)
     this.scene.impact.add.existing(this)
 
     this.body.collides = Phaser.Physics.Impact.COLLIDES.NEVER
 
-    this.formation = null;
-
-
     this.moveMode = gametools.statics.steeringBehaviours.ARRIVAL;
+
+
+
+
+    this.objective = objective || new Objective(x,y)
 
     this.rotationLock = true;
 
@@ -25,7 +29,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.linearVelocity         = this.body.vel
     this.desiredVelocity        = gametools.utils.vector.vector2d(0,0)
     this.steering               = gametools.utils.vector.vector2d(0,0)
-    this.objective              = new Objective()
+
     this.orientation            = this.body.angle // In Radians
     this.maxLinearSpeed         = 100;
     this.maxLinearAcceleration  = 50;
@@ -63,19 +67,18 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.linearVelocity.y += velocity.y
   }
 
+
+
   setTarget(target){
     this.target = target
   }
-
   setMoveMode(moveMode){
     this.moveMode = moveMode
   }
-
   setObjective(objective){
     this.objective = objective
   }
-
-  clearObjecective(){
+  clearObjective(){
     this.objective = new Objective()
   }
 
@@ -90,36 +93,21 @@ class Steerable extends Phaser.GameObjects.Sprite {
   applySteering(){
     switch(this.moveMode){
       case gametools.statics.steeringBehaviours.IDLE    : this.idle(); break;
-      case gametools.statics.steeringBehaviours.SEEK    : this.seek(this.objective.position, 0); break;
-      case gametools.statics.steeringBehaviours.ARRIVAL : this.seek(this.objective.position, 100); break;
+      case gametools.statics.steeringBehaviours.SEEK    : this.seek(this.objective.target, 0); break;
+      case gametools.statics.steeringBehaviours.ARRIVAL : this.seek(this.objective.target, 100); break;
       case gametools.statics.steeringBehaviours.FLEE    : this.flee(); break;
       case gametools.statics.steeringBehaviours.WANDER  : this.wander(); break;
       case gametools.statics.steeringBehaviours.PURSUIT : this.pursuit(); break;
       case gametools.statics.steeringBehaviours.EVADE   : this.evade(); break;
       case gametools.statics.steeringBehaviours.FOLLOW  : this.follow(); break;
     }
-    if(this.rotationLock || this.formation.flagship == this) {
-      this.setRotation(Phaser.Math.Angle.RotateTo(
-        this.rotation,
-        this.linearVelocity.toAngle(),
-        0.05
-      ))
-    }else{
-      if(this.formation){
-        this.setRotation(Phaser.Math.Angle.RotateTo(
-          this.rotation,
-          this.formation.flagship.rotation,
-          0.025
-        ))
-      }
-    }
+
   }
 
   idle(){
     this.desiredVelocity = this.linearVelocity.clone().scale(0.9)
     this.setLinearVelocity(this.desiredVelocity)
   }
-
   seek(target, radius, brace){
     brace = brace || 0
 
@@ -142,7 +130,6 @@ class Steerable extends Phaser.GameObjects.Sprite {
 
     this.addLinearVelocity(this.force)
   }
-
   flee(){
     this.rotationLock = true
     var force = gametools.utils.vector.vector2d(0,0)
@@ -162,57 +149,80 @@ class Steerable extends Phaser.GameObjects.Sprite {
 }
 
 class BaseUnit extends Steerable{
-  constructor(scene, x, y, texture, frame, options){
-    super(scene, x, y, texture, frame, options)
-    this.rating = 1;
+  constructor(gameManager,scene, x, y, texture, team, formation){
+    super(gameManager,scene, x, y, texture)
+    this.type = "unit"
+    this.rating = 4;
     this.health = 1
-    this.team = gametools.statics.teams.NEUTRAL
-    this.target = null;
+    this.range = 800;
+    this.team = team || gametools.statics.teams.NEUTRAL
     this.attachments = []
+    this.formation = formation || gameManager.factory.add.Formation([this], this, this.team)
 
   }
 
   update(){
-    switch(this.objective.action){
-      case gametools.statics.commands.HOLD   : this.hold();   break;
-      case gametools.statics.commands.MOVE   : this.move();   break;
-      case gametools.statics.commands.ATTACK : this.attack(); break;
+    switch (this.objective.action) {
+      case gametools.statics.commands.HOLD:
+        // console.log("idle");
+        this.idle()
+        break;
+      case gametools.statics.commands.MOVE:
+        // console.log(this);
+        this.seek(this.objective.target, 100)
+        break;
+      case gametools.statics.commands.ATTACK:
+
+        break;
+
     }
-    super.update()
+    if(this.formation){
+      if(this.objective.distanceFrom(this.position) <= 50 && this.formation.flagship != this){
+        this.setRotation(Phaser.Math.Angle.RotateTo(
+          this.rotation,
+          this.formation.flagship.rotation,
+          0.015
+        ))
+
+      }else{
+        this.setRotation(Phaser.Math.Angle.RotateTo(
+          this.rotation,
+          this.linearVelocity.toAngle(),
+          0.03
+        ))
+      }
+
+
+    }
   }
-  hold(){
-    this.moveMode = gametools.statics.steeringBehaviours.IDLE
+
+  setFormation(formation){
+    this.formation.removeUnit(this)
+    this.formation = formation
   }
-  move(){
-    this.moveMode = gametools.statics.steeringBehaviours.ARRIVAL
-  }
+
   destroy(){
-    this.formation.removeUnits([this])
-    this.formation.organise()
-    this.formation = null;
-    this.attachments.forEach((attachment) => {
-      attachment.destroy()
-    })
-    this.scene.gameManager.removeUnit(this)
+  }
+
+}
+
+class SlowUnit extends BaseUnit{
+  constructor(gameManager,scene, x, y, texture, team, formation){
+    super(gameManager,scene, x, y, texture, team, formation)
+    this.rating = 40;
+    this.maxLinearSpeed = 50
+    this.maxLinearAcceleration = 30
+    this.maxAngularSpeed = 2
+    this.maxAngularAcceleration = 1
   }
 }
 class FastUnit extends BaseUnit{
-  constructor(scene, x, y, texture, frame, options){
-    super(scene, x, y, texture, frame, options)
-    this.rating = 12;
-    this.maxAngularSpeed = 4;
-    this.maxAngularAcceleration = 1.4;
-    this.maxLinearSpeed = 100
+  constructor(gameManager,scene, x, y, texture, team, formation){
+    super(gameManager,scene, x, y, texture, team, formation)
+    this.rating = 10;
+    this.maxLinearSpeed = 150
     this.maxLinearAcceleration = 80
-  }
-}
-class SlowUnit extends BaseUnit{
-  constructor(scene, x, y, texture, frame, options){
-    super(scene, x, y, texture, frame, options)
-    this.rating = 60;
-    this.maxAngularSpeed = 0.4;
-    this.maxAngularAcceleration = 0.1;
-    this.maxLinearSpeed = 40
-    this.maxLinearAcceleration = 20
+    this.maxAngularSpeed = 6
+    this.maxAngularAcceleration = 5
   }
 }

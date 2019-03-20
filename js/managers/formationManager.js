@@ -1,110 +1,115 @@
 class Formation{
-  constructor(units){
+  constructor(gameManager, units, flagship, team){
+    console.log(units, flagship);
+    this.type = "formation"
+    this.team = team || gametools.statics.teams.NEUTRAL
+    this.gameManager = gameManager;
     this.units = units || []
-    this.flagship = units[0] || {rating: 0}
-    var pos = units[0].getPosition()
-    this.objective = new MoveTo(pos.x, pos.y)
+    this.flagship = {rating: 0};
+    this.children = []
+    this.formation = gametools.statics.formations.T
+    this.objective = null
+    this.lastcheck = this.gameManager.gameScene.time.now
+    this.checkInterval = 500;
+    this.units.forEach((unit)=>{if(unit.formation != this && unit.formation != undefined){unit.setFormation(this)}},this)
+    console.log(this);
+    this.setFlagship()
 
-    this.ring ={
-      units: [],
-      max: 6,
-      radius : 100
-    }
-
-    this.findFlagship()
-    this.organise()
 
   }
-  addUnits(units){
-    this.units.concat(units)
-    this.organise()
+  addUnit(unit){
+    console.log("ADDING", this.units.indexOf(unit) != -1);
+    if(this.units.indexOf(unit) != -1)return
+    this.units.push(unit)
+    unit.setFormation(this)
+    this.setFlagship()
   }
-  removeUnits(units){
-    units.forEach(() => {
-      this.formation.units.splice(this.formation.units.indexOf(this),1)
-    })
-  }
-  setObjective(objective){
-    console.log("objective called");
-    console.log(objective);
-    this.flagship.setObjective(objective)
-  }
-  getFlagshipPos(){
-    var pos = this.flagship.getPosition()
-    return gametools.utils.vector.vector2d(pos.x, pos.y)
-  }
-  organise(){
-    this.units.forEach((unit)=>{unit.formation = this}, this)
-    var toSort = Array.from(this.units)
-    toSort.splice(toSort.indexOf(this.flagship),1)
-    this.ring.units = toSort;
+  removeUnit(unit){
+    console.log("REMOVING UNIT");
+    console.log(this.units);
+    this.units.splice(this.units.indexOf(unit),1)
+    console.log(this.units);
+    this.setFlagship()
   }
 
-  update(){
-    var ring = this.generateRing(this.flagship, this.ring.units.length, this.ring.radius)
-    for(var i = 0; i < this.ring.units.length; i++){
-      this.ring.units[i].setObjective(ring[i])
-    }
-    var pos = this.getFlagshipPos()
-    if(this.flagship.objective.distanceFrom(pos) < 20 && this.flagship.objective.action !=gametools.statics.commands.HOLD){
-      console.log("OBJECTIVE REACHED");
-      var objPos = this.flagship.objective.position
-      this.setObjective(new Hold(objPos.x,objPos.y))
-    }
-  }
-  generateRing(flagship, count, radius){
-    var rot = (360 * Math.PI/180) / count;
-    var ring = []
-    var pos = flagship.position.clone()
-    pos.add(flagship.linearVelocity)
-    for(var i = 0; i < count; i++){
-      var unitPos = gametools.utils.vector.vector2d(pos.x, pos.y)
-      var ringShift = gametools.utils.vector.vector2d(radius,0)
-      ringShift.angleTo(this.flagship.rotation + (rot*i))
-      unitPos.add(ringShift)
-      ring.push(new MoveTo(unitPos.x, unitPos.y))
-    }
-    return ring
+  refresh(){
+    this.units.forEach((unit)=>{
+      if(unit.formation != this){
+        unit.setFormation(this)
+      }
+    },this)
   }
 
-  findFlagship(){
+  setFlagship(){
+    console.log("FLAGSHIP IS BEING SET");
     for(var i = 0; i < this.units.length; i++){
       console.log(this.units[i].rating);
+      console.log(this.units[i].rating > this.flagship.rating);
       if(this.units[i].rating > this.flagship.rating){
         this.flagship = this.units[i]
+        this.objective = this.flagship.Objective
       }
     }
+    this.children = this.units.slice(0)
+
+    console.log(this.children);
+    this.children.splice(this.children.indexOf(this.flagship),1)
+
+    console.log(this.children);
+    if(this.team == gametools.statics.teams.PLAYER){
+      this.flagship.setInteractive({useHandCursor:true}).on('pointerdown', () => {this.gameManager.uiScene.updateMenu(this.flagship.formation)})
+    }
+
   }
+
+
+
+  update(){
+    if(this.units.length == 0){
+      this.gameManager.formations.splice(this.gameManager.formations.indexOf(this), 1)
+    }
+
+    if(this.gameManager.gameScene.time.now - this.lastcheck > this.checkInterval){
+      var attackTarget = this.gameManager.getNearestFormation(this, this.flagship.range)
+      if(attackTarget){
+        console.log(attackTarget);
+      }
+      this.lastcheck = this.gameManager.gameScene.time.now
+    }
+
+    switch (this.flagship.objective.action) {
+      case gametools.statics.commands.HOLD   :
+        this.children.forEach((unit)=>{unit.setObjective(this.flagship.objective)}, this)
+        break;
+      case gametools.statics.commands.MOVE   :
+        // console.log("FORMATION SAYS MOVE", this);
+        var placements = gametools.utils.formator.T(this.children.length, 100 , this.flagship.getPosition(), this.flagship.rotation)
+        for(var i = 0; i < placements.length; i++){
+          var unitPos = placements[i]
+          // console.log(this.children[i]);
+          this.children[i].setObjective(new Objective(unitPos.x, unitPos.y, gametools.statics.commands.MOVE))
+        }
+        break;
+      case gametools.statics.commands.ATTACK : break;
+    }
+
+
+  }
+
 }
 
 class Objective{
-  constructor(x, y){
-    this.position = gametools.utils.vector.vector2d(x,y)
-    this.action = gametools.statics.commands.HOLD
+  constructor(x,y,action){
+    this.target = gametools.utils.vector.vector2d(x,y)
+    this.action = action || gametools.statics.commands.HOLD
+  }
+  setTarget(vector){
+    this.target = vector
+  }
+  setAction(action){
+    this.action = action
   }
   distanceFrom(pos){
-    return pos.clone().subtract(this.position).length()
-  }
-}
-class Hold extends Objective{
-  constructor(x,y){
-    x = x || 0
-    y = y || 0
-    super(x,y)
-    this.action = gametools.statics.commands.HOLD
-
-  }
-}
-class MoveTo extends Objective{
-  constructor(x,y){
-    super(x,y)
-    this.action = gametools.statics.commands.MOVE
-
-  }
-}
-class Attack extends Objective{
-  constructor(x,y){
-    super(x,y)
-    this.action =gametools.statics.commands.ATTACK
+    return this.target.clone().subtract(pos).length()
   }
 }
