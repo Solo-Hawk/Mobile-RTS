@@ -17,7 +17,7 @@ var config = {
     min: 15,
     target: 30,
   },
-  scene: [SceneLoader, SceneMenu, SceneLevelDevelopment],
+  scene: [SceneLoader, SceneMenu, SceneLevelDevelopment, GameInterface],
   plugins: {
     scene: [
       { key: "NavMeshPlugin", plugin: PhaserNavMeshPlugin, mapping: "navMeshPlugin", start: true }
