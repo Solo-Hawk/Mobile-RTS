@@ -3,9 +3,33 @@ class SceneLoader extends Phaser.Scene{
     super("loader")
   }
   preload(){
-    {
     console.log(this);
+    createProgressBar.call(this)
+
     // All Main Assets are loaded here
+
+    this.load.on('complete', function () {
+        progressBar.destroy();
+        progressBox.destroy();
+        loadingText.destroy();
+        percentText.destroy();
+        assetText.destroy();
+        this.scene.switch("mainmenu")
+    }, this);
+
+    this.load.image('1Heavy', 'assets/ship_blue_heavy.png');
+    this.load.image('2Heavy', 'assets/ship_red_heavy.png');
+    this.load.image('1Light', 'assets/ship_blue_light.png');
+    this.load.image('2Light', 'assets/ship_red_light.png');
+  }
+  create(){
+
+  }
+  update(){
+
+  }
+
+  createProgressBar(){
     var progressBar = this.add.graphics();
 
     var width = this.cameras.main.width;
@@ -59,26 +83,5 @@ class SceneLoader extends Phaser.Scene{
     this.load.on('fileprogress', function (file) {
         assetText.setText('Loading asset: ' + file.key);
     });
-
-    this.load.on('complete', function () {
-        progressBar.destroy();
-        progressBox.destroy();
-        loadingText.destroy();
-        percentText.destroy();
-        assetText.destroy();
-        this.scene.switch("mainmenu")
-    }, this);
-  }
-
-    this.load.image('1Heavy', 'assets/ship_blue_heavy.png');
-    this.load.image('2Heavy', 'assets/ship_red_heavy.png');
-    this.load.image('1Light', 'assets/ship_blue_light.png');
-    this.load.image('2Light', 'assets/ship_red_light.png');
-  }
-  create(){
-
-  }
-  update(){
-
   }
 }
