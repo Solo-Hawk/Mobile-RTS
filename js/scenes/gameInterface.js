@@ -135,7 +135,7 @@ class GameInterface extends Phaser.Scene{
 
 
 
-    this.buttons.fighterButton               = new CircleLabelButton(this, "Fighters", this.textStyles.sub         , 1, x+25       , y-150      , 50, 0x0000ff, 1)
+    this.buttons.fighterButton               = new CircleLabelButton(this, "Fighters", this.textStyles.sub         , 1, x+25      , y-150      , 50, 0x0000ff, 1)
     var fib={x: this.buttons.fighterButton.x, y: this.buttons.fighterButton.y}
 
     this.buttons.lightFighterAdd             = new CircleLabelButton(this,""         , this.textStyles.description, 1, fib.x      , fib.y-90   , 35, 0x0000ff, 1)
@@ -443,13 +443,13 @@ class GameInterface extends Phaser.Scene{
 }
 
 class RectLabelButton extends Phaser.GameObjects.Text{
-  constructor(scene,text,textStyle,textalpha,x,y,width,height,fillColor,fillAlpha,element){
+  constructor(scene,text,textStyle,textalpha,x,y,width,height,fillColor,fillAlpha,interfaceComponent){
     console.log("Adding Button");
     super(scene,x,y,text,textStyle)
 
     this.scene = scene
     this.body = this.scene.add.rectangle(x,y,width,height,fillColor,fillAlpha)
-    this.uiElement = element || "base"
+    this.interfaceComponent =  interfaceComponent || {id: "base", group: "base", primary: false}
     this.setOrigin(0.5,0.5)
     this.setDepth(320)
     this.body.setDepth(300)
