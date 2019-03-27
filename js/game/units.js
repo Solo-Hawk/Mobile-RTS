@@ -11,7 +11,9 @@ class Interactable extends Phaser.GameObjects.Sprite{
     this.setOrigin(0.5, 0.5)
     this.scene.impact.add.existing(this)
 
-    this.setInteractive().on("pointerdown", ()=>{console.log("down on ", this);}, gameManager.userInteface)
+    this.setInteractive().on("pointerdown", ()=>{
+      console.log(this);
+      gameManager.userInterface.events.emit("set-focus",this);}, gameManager.userInterface)
 
   }
 

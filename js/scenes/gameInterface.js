@@ -3,7 +3,8 @@ class GameInterface extends Phaser.Scene{
     super("game-interface");
   }
   init(gameScene){
-      this.textStyles = {
+    this.gameScene = gameScene;
+    this.textStyles = {
         main:{
           fontSize: '40px',
           fontFamily: 'Trebuchet MS',
@@ -34,6 +35,70 @@ class GameInterface extends Phaser.Scene{
           align: 'center'
         }
       }
+    this.values = {};
+    this.values.config = {
+        formation:{
+          maxRating: 180,
+          maxCapacity: 30
+        },
+        fighters: {
+          light: {
+            cost: 10,
+            rating: 1
+          },
+          heavy: {
+            cost: 25,
+            rating: 2
+          }
+        },
+        frigates: {
+          swatter:{
+            cost: 110,
+            rating: 14
+          },
+          bastion:{
+            cost: 135,
+            rating: 16
+          },
+          slammer:{
+            cost: 180,
+            rating: 20
+          }
+        },
+        cruisers: {
+          leviathan: {
+            cost: 700,
+            rating: 100
+          },
+          hunter: {
+            cost: 950,
+            rating: 124
+          }
+        }
+      }
+    this.values.factory = {
+        open:false,
+        rating: 0,
+        capacity: 0,
+        cost:0,
+        fighters: {
+          heavy: 0,
+          light: 0
+        },
+        frigates: {
+          swatter:0,
+          bastion:0,
+          slammer:0
+        },
+        cruisers: {
+          leviathan: 0,
+          hunter: 0
+        }
+      }
+    this.values.game = {
+        constructionUnits: 1000
+      }
+    this.buttons = {}
   }
 
   preload(){
@@ -42,72 +107,9 @@ class GameInterface extends Phaser.Scene{
 
   create(){
     console.log("HERE");
-    this.values = {};
-    this.values.config = {
-      formation:{
-        maxRating: 180,
-        maxCapacity: 30
-      },
-      fighters: {
-        light: {
-          cost: 10,
-          rating: 1
-        },
-        heavy: {
-          cost: 25,
-          rating: 2
-        }
-      },
-      frigates: {
-        swatter:{
-          cost: 110,
-          rating: 14
-        },
-        bastion:{
-          cost: 135,
-          rating: 16
-        },
-        slammer:{
-          cost: 180,
-          rating: 20
-        }
-      },
-      cruisers: {
-        leviathan: {
-          cost: 700,
-          rating: 100
-        },
-        hunter: {
-          cost: 950,
-          rating: 124
-        }
-      }
-    }
-    this.values.factory = {
-      open:false,
-      rating: 0,
-      capacity: 0,
-      cost:0,
-      fighters: {
-        heavy: 0,
-        light: 0
-      },
-      frigates: {
-        swatter:0,
-        bastion:0,
-        slammer:0
-      },
-      cruisers: {
-        leviathan: 0,
-        hunter: 0
-      }
-    }
-    this.values.game = {
-      constructionUnits: 1000
-    }
-    this.buttons = {}
 
-    this.events.on("item-selected", (interfaceComponent)=>{
+
+    this.events.on("set-focus", (interfaceComponent)=>{
       this.setFocus(interfaceComponent)
     }, this)
 
@@ -117,6 +119,10 @@ class GameInterface extends Phaser.Scene{
     this.buttons.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
   }
 
+  setFocus(focus){
+    console.log(focus);
+    console.log(focus.type);
+  }
 
   createFactoryUI(){
     //Factory UI Button System
@@ -129,6 +135,7 @@ class GameInterface extends Phaser.Scene{
     this.buttons.factoryButton.setOrigin(-0.25,1.50)
     this.buttons.factoryButton.setInteractive().on("pointerdown", ()=>{
       if(this.values.factory.open){
+        this.events.emit("set-focus", {type:"unit-factory"})
         this.values.factory.open = false
         this.setSelectorMenu(false)
         this.setFighterMenu(false)
@@ -145,44 +152,44 @@ class GameInterface extends Phaser.Scene{
 
 
 
-    this.buttons.fighterButton               = new CircleLabelButton(this, "Fighters", this.textStyles.sub        , 1, x+75        , y-300       , 80, 0x0000ff, 1)
+    this.buttons.fighterButton               = new CircleLabelButton(this, "Fighters", this.textStyles.sub        , 1, x+75        , y-300        , 80, 0x0000ff, 1)
     var fib={x: this.buttons.fighterButton.x, y: this.buttons.fighterButton.y}
 
-    this.buttons.lightFighterAdd             = new CircleLabelButton(this,""         , this.textStyles.description, 1, fib.x       , fib.y-130   , 60, 0x0000ff, 1)
-    this.buttons.lightFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+50    , fib.y-130-50, 28, 0xff0000, 1)
-    this.buttons.lightFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x       , fib.y-60    , 20, 0xff0000, 0)
+    this.buttons.lightFighterAdd             = new CircleLabelButton(this,""         , this.textStyles.description, 1, fib.x       , fib.y-160    , 60, 0x0000ff, 1)
+    this.buttons.lightFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+70    , fib.y-160-70 , 34, 0xff0000, 1)
+    this.buttons.lightFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x       , fib.y-60     , 20, 0xff0000, 0)
 
-    this.buttons.heavyFighterAdd             = new CircleLabelButton(this, ""        , this.textStyles.description, 1, fib.x+102   , fib.y-80    , 60, 0x0000ff, 1)
-    this.buttons.heavyFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+102+50, fib.y-80-50 , 28, 0xff0000, 1)
-    this.buttons.heavyFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x+48    , fib.y-34    , 20, 0xff0000, 0)
+    this.buttons.heavyFighterAdd             = new CircleLabelButton(this, ""        , this.textStyles.description, 1, fib.x+120   , fib.y-96     , 60, 0x0000ff, 1)
+    this.buttons.heavyFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+120+70, fib.y-96-70  , 34, 0xff0000, 1)
+    this.buttons.heavyFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x+48    , fib.y-34     , 20, 0xff0000, 0)
 
 
-    this.buttons.frigateButton               = new CircleLabelButton(this, "Frigates", this.textStyles.sub        , 1, x+220       , y-220       , 80, 0x0000ff, 1)
+    this.buttons.frigateButton               = new CircleLabelButton(this, "Frigates", this.textStyles.sub        , 1, x+220       , y-220        , 80, 0x0000ff, 1)
     var frb={x: this.buttons.frigateButton.x, y: this.buttons.frigateButton.y}
 
-    this.buttons.swatterFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x       , frb.y-135   , 60, 0x0000ff, 1)
-    this.buttons.swatterFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+50    , frb.y-135-50, 28, 0xff0000, 1)
-    this.buttons.swatterFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x       , frb.y-60    , 20, 0xff0000, 0)
+    this.buttons.swatterFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x       , frb.y-160    , 60, 0x0000ff, 1)
+    this.buttons.swatterFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+70    , frb.y-160-70 , 34, 0xff0000, 1)
+    this.buttons.swatterFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x       , frb.y-60     , 20, 0xff0000, 0)
 
-    this.buttons.bastionFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+95    , frb.y-95    , 60, 0x0000ff, 1)
-    this.buttons.bastionFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+95+50 , frb.y-95-50 , 28, 0xff0000, 1)
-    this.buttons.bastionFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+40    , frb.y-40    , 20, 0xff0000, 0)
+    this.buttons.bastionFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+114    , frb.y-114   , 60, 0x0000ff, 1)
+    this.buttons.bastionFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+114+70 , frb.y-114-70, 34, 0xff0000, 1)
+    this.buttons.bastionFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+40    , frb.y-40     , 20, 0xff0000, 0)
 
-    this.buttons.slammerFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+135   , frb.y       , 60, 0x0000ff, 1)
-    this.buttons.slammerFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+135+50, frb.y-50    , 28, 0xff0000, 1)
-    this.buttons.slammerFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+60    , frb.y       , 20, 0xff0000, 0)
+    this.buttons.slammerFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+160   , frb.y        , 60, 0x0000ff, 1)
+    this.buttons.slammerFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+160+70, frb.y-70     , 34, 0xff0000, 1)
+    this.buttons.slammerFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+60    , frb.y        , 20, 0xff0000, 0)
 
 
-    this.buttons.cruiserButton               = new CircleLabelButton(this, "Cruisers", this.textStyles.sub        , 1, x+300       , y-75        , 80, 0x0000ff, 1)
+    this.buttons.cruiserButton               = new CircleLabelButton(this, "Cruisers", this.textStyles.sub        , 1, x+300       , y-75         , 80, 0x0000ff, 1)
     var crb={x: this.buttons.cruiserButton.x, y: this.buttons.cruiserButton.y}
 
-    this.buttons.leviathanCruiserAdd         = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+80    , crb.y-102   , 60, 0x0000ff, 1)
-    this.buttons.leviathanCruiserRemove      = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+80+50 , crb.y-102-50, 28, 0xff0000, 1)
-    this.buttons.leviathanCruiserLabel       = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+34    , crb.y-58    , 20, 0xff0000, 0)
+    this.buttons.leviathanCruiserAdd         = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+96    , crb.y-120    , 60, 0x0000ff, 1)
+    this.buttons.leviathanCruiserRemove      = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+96+70 , crb.y-120-70 , 34, 0xff0000, 1)
+    this.buttons.leviathanCruiserLabel       = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+34    , crb.y-58     , 20, 0xff0000, 0)
 
-    this.buttons.hunterCruiserAdd            = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+130   , crb.y       , 60, 0x0000ff, 1)
-    this.buttons.hunterCruiserRemove         = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+130+50, crb.y-50    , 28, 0xff0000, 1)
-    this.buttons.hunterCruiserLabel          = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+60    , crb.y       , 20, 0xff0000, 0)
+    this.buttons.hunterCruiserAdd            = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+160   , crb.y        , 60, 0x0000ff, 1)
+    this.buttons.hunterCruiserRemove         = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+160+70, crb.y-70     , 34, 0xff0000, 1)
+    this.buttons.hunterCruiserLabel          = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+60    , crb.y        , 20, 0xff0000, 0)
 
 
     this.buttons.lightFighterAdd    .setText(this.values.config.fighters.light.rating     +"r\nLight\n"     +this.values.config.fighters.light.cost      +"CU")

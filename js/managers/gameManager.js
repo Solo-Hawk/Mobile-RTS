@@ -1,8 +1,8 @@
 class GameManager{
-  constructor(gameScene, userInteface){
-    console.log(gameScene, userInteface);
+  constructor(gameScene, userInterface){
+    console.log(gameScene, userInterface);
     this.gameScene = gameScene
-    this.userInteface = userInteface
+    this.userInterface = userInterface
     this.units = []
     this.formations = []
 
