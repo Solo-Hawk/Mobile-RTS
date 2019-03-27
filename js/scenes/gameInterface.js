@@ -101,20 +101,16 @@ class GameInterface extends Phaser.Scene{
     }
     this.buttons = {}
 
-    {
-    // var rectButton = new RectLabelButton(this,"Game Button", this.textStyle ,1, 300, 300, 150, 50, 0xff0000, 1)
-    // rectButton.setInteractive({useHandCursor:true}).on("pointerdown", ()=>{console.log("Button is down", this);})
     this.events.on("item-selected", (interfaceComponent)=>{
       this.setFocus(interfaceComponent)
     }, this)
 
-    // var circButton = new CircleLabelButton(this,"Factory", this.textStyle, 1, 0, 300, 100, 0x0000ff, 1)
-    // circButton.setInteractive({useHandCursor:true}).on("pointerdown", ()=>{console.log("Button is down", this);})
     this.createFactoryUI()
+  }
   update(delta, time){
     this.buttons.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
   }
-    }
+
 
   createFactoryUI(){
     //Factory UI Button System
@@ -125,20 +121,21 @@ class GameInterface extends Phaser.Scene{
 
     this.buttons.factoryButton = new CircleLabelButton(this,"Build", this.textStyles.main, 1, x, y, 100, 0x0000ff, 1)
     this.buttons.factoryButton.setOrigin(-0.25,1.50)
+    this.buttons.factoryButton.setInteractive().on("pointerdown", ()=>{
       if(this.values.factory.open){
-      this.values.factory.open = false
+        this.values.factory.open = false
         this.setSelectorMenu(false)
         this.setFighterMenu(false)
         this.setFrigateMenu(false)
         this.setCruiserMenu(false)
       }else{
-      this.values.factory.open = true
+        this.values.factory.open = true
         this.setSelectorMenu(true)
         this.setFighterMenu(false)
         this.setFrigateMenu(false)
         this.setCruiserMenu(false)
       }
-    });
+    })
 
 
 
