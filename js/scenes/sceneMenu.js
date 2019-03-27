@@ -52,7 +52,7 @@ class SceneMenu extends Phaser.Scene{
       .setInteractive({useHandCursor:true})
       .on('pointerover', () => {this.buttons.newGame.body.setFillStyle(0x3700B3);})
       .on('pointerout', () => {this.buttons.newGame.body.setFillStyle(0x6200EE);} )
-      .on('pointerdown', () => {this.scene.switch("level-development");} )
+      .on('pointerdown', () => {this.scale.startFullscreen();this.scene.switch("level-development");} )
       .on('pointerup', () => {this.buttons.newGame.body.setFillStyle(0x3700B3);}
     );
 

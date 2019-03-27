@@ -1,8 +1,8 @@
 
 var config = {
   type: Phaser.AUTO,
-  width: 1400, //824
-  height: 564, //412
+  width: 2280, //824
+  height: 1080, //412
   pixelArt: false,
   physics: {
     default: 'impact',
@@ -22,6 +22,9 @@ var config = {
     scene: [
       { key: "NavMeshPlugin", plugin: PhaserNavMeshPlugin, mapping: "navMeshPlugin", start: true }
     ]
+  },
+  scale:{
+    mode:Phaser.Scale.FIT
   }
 
 }
