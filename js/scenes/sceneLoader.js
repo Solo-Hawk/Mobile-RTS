@@ -4,18 +4,11 @@ class SceneLoader extends Phaser.Scene{
   }
   preload(){
     console.log(this);
-    createProgressBar.call(this)
+    this.createProgressBar.call(this)
 
     // All Main Assets are loaded here
 
-    this.load.on('complete', function () {
-        progressBar.destroy();
-        progressBox.destroy();
-        loadingText.destroy();
-        percentText.destroy();
-        assetText.destroy();
-        this.scene.switch("mainmenu")
-    }, this);
+
 
     this.load.image('1Heavy', 'assets/ship_blue_heavy.png');
     this.load.image('2Heavy', 'assets/ship_red_heavy.png');
@@ -83,5 +76,13 @@ class SceneLoader extends Phaser.Scene{
     this.load.on('fileprogress', function (file) {
         assetText.setText('Loading asset: ' + file.key);
     });
+    this.load.on('complete', function () {
+        progressBar.destroy();
+        progressBox.destroy();
+        loadingText.destroy();
+        percentText.destroy();
+        assetText.destroy();
+        this.scene.switch("mainmenu")
+    }, this);
   }
 }

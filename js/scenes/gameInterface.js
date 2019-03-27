@@ -97,18 +97,26 @@ class GameInterface extends Phaser.Scene{
       }
     }
     this.values.game = {
-      constructionUnits: 10000
+      constructionUnits: 1000
     }
     this.buttons = {}
 
     {
     // var rectButton = new RectLabelButton(this,"Game Button", this.textStyle ,1, 300, 300, 150, 50, 0xff0000, 1)
     // rectButton.setInteractive({useHandCursor:true}).on("pointerdown", ()=>{console.log("Button is down", this);})
+    this.events.on("item-selected", (interfaceComponent)=>{
+      this.setFocus(interfaceComponent)
+    }, this)
 
     // var circButton = new CircleLabelButton(this,"Factory", this.textStyle, 1, 0, 300, 100, 0x0000ff, 1)
     // circButton.setInteractive({useHandCursor:true}).on("pointerdown", ()=>{console.log("Button is down", this);})
+    this.createFactoryUI()
+  update(delta, time){
+    this.buttons.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
+  }
     }
 
+  createFactoryUI(){
     //Factory UI Button System
     var x = 10;
     console.log(this);
@@ -117,7 +125,6 @@ class GameInterface extends Phaser.Scene{
 
     this.buttons.factoryButton = new CircleLabelButton(this,"Build", this.textStyles.main, 1, x, y, 100, 0x0000ff, 1)
     this.buttons.factoryButton.setOrigin(-0.25,1.50)
-    this.buttons.factoryButton.setInteractive().on("pointerdown", ()=>{
       if(this.values.factory.open){
       this.values.factory.open = false
         this.setSelectorMenu(false)
@@ -152,7 +159,7 @@ class GameInterface extends Phaser.Scene{
 
     this.buttons.swatterFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x      , frb.y-90   , 35, 0x0000ff, 1)
     this.buttons.swatterFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+27   , frb.y-90-27, 8 , 0xff0000, 1)
-    this.buttons.swatterFrigateLabel        = new CircleLabelButton(this, "0"        , this.textStyles.remove     , 1, frb.x      , frb.y-50   , 8 , 0xff0000, 0)
+    this.buttons.swatterFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.remove     , 1, frb.x      , frb.y-50   , 8 , 0xff0000, 0)
 
     this.buttons.bastionFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+60   , frb.y-60   , 35, 0x0000ff, 1)
     this.buttons.bastionFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+60+27, frb.y-60-27, 8 , 0xff0000, 1)
@@ -175,13 +182,13 @@ class GameInterface extends Phaser.Scene{
     this.buttons.hunterCruiserLabel          = new CircleLabelButton(this, "0"       , this.textStyles.remove     , 1, crb.x+50   , crb.y      , 8 , 0xff0000, 0)
 
 
-    this.buttons.lightFighterAdd    .setText(this.values.config.fighters.light.rating     +"r\nLight\n"     +this.values.config.fighters.light.cost)
-    this.buttons.heavyFighterAdd    .setText(this.values.config.fighters.heavy.rating     +"r\nHeavy\n"     +this.values.config.fighters.heavy.cost)
-    this.buttons.swatterFrigateAdd  .setText(this.values.config.frigates.swatter.rating   +"r\nSwatter\n"   +this.values.config.frigates.swatter.cost)
-    this.buttons.bastionFrigateAdd  .setText(this.values.config.frigates.bastion.rating   +"r\nBastion\n"   +this.values.config.frigates.bastion.cost)
-    this.buttons.slammerFrigateAdd  .setText(this.values.config.frigates.slammer.rating   +"r\nSlammer\n"   +this.values.config.frigates.slammer.cost)
-    this.buttons.leviathanCruiserAdd.setText(this.values.config.cruisers.leviathan.rating +"r\nLeviathan\n" +this.values.config.cruisers.leviathan.rating)
-    this.buttons.hunterCruiserAdd   .setText(this.values.config.cruisers.hunter.rating    +"r\nHunter\n"    +this.values.config.cruisers.hunter.rating)
+    this.buttons.lightFighterAdd    .setText(this.values.config.fighters.light.rating     +"r\nLight\n"     +this.values.config.fighters.light.cost      +"CU")
+    this.buttons.heavyFighterAdd    .setText(this.values.config.fighters.heavy.rating     +"r\nHeavy\n"     +this.values.config.fighters.heavy.cost      +"CU")
+    this.buttons.swatterFrigateAdd  .setText(this.values.config.frigates.swatter.rating   +"r\nSwatter\n"   +this.values.config.frigates.swatter.cost    +"CU")
+    this.buttons.bastionFrigateAdd  .setText(this.values.config.frigates.bastion.rating   +"r\nBastion\n"   +this.values.config.frigates.bastion.cost    +"CU")
+    this.buttons.slammerFrigateAdd  .setText(this.values.config.frigates.slammer.rating   +"r\nSlammer\n"   +this.values.config.frigates.slammer.cost    +"CU")
+    this.buttons.leviathanCruiserAdd.setText(this.values.config.cruisers.leviathan.rating +"r\nLeviathan\n" +this.values.config.cruisers.leviathan.cost  +"CU")
+    this.buttons.hunterCruiserAdd   .setText(this.values.config.cruisers.hunter.rating    +"r\nHunter\n"    +this.values.config.cruisers.hunter.cost     +"CU")
 
 
     this.buttons.fighterButton          .setInteractive().on("pointerdown", ()=>{this.setFighterMenu(true);})
@@ -221,11 +228,6 @@ class GameInterface extends Phaser.Scene{
     this.setFighterMenu(false)
     this.setFrigateMenu(false)
     this.setCruiserMenu(false)
-
-  }
-
-  update(delta, time){
-    this.buttons.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
   }
 
   changeLightFighter(value){
@@ -383,9 +385,18 @@ class GameInterface extends Phaser.Scene{
     this.buttons.slammerFrigateLabel    .setText(this.values.factory.frigates.slammer)
     this.buttons.hunterCruiserLabel     .setText(this.values.factory.cruisers.hunter)
     this.buttons.leviathanCruiserLabel  .setText(this.values.factory.cruisers.leviathan)
-    this.buttons.formationCapacityCount .setText("Units: "+ this.values.factory.capacity + "/30")
-    this.buttons.formationRating        .setText("Rating: "+ this.values.factory.rating + "/180")
-    this.buttons.formationCost          .setText("Cost: "+ this.values.factory.cost + " CU")
+
+    this.buttons.formationCapacityCount .setText("Units: "+ this.values.factory.capacity + "/30").setColor(this.values.factory.capacity == this.values.config.formation.maxCapacity ? "#ff2222" : "#ffffff")
+    this.buttons.formationRating        .setText("Rating: "+ this.values.factory.rating + "/180").setColor(this.values.factory.rating   == this.values.config.formation.maxRating   ? "#ff2222" : "#ffffff")
+    this.buttons.formationCost          .setText("Cost: "+ this.values.factory.cost + " CU")     .setColor(this.values.factory.cost     >=  this.values.game.constructionUnits      ? "#ff2222" : "#ffffff")
+
+    this.buttons.lightFighterAdd    .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.light.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.light.rating     > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.buttons.heavyFighterAdd    .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.heavy.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.heavy.rating     > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.buttons.swatterFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.swatter.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.swatter.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.buttons.bastionFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.bastion.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.bastion.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.buttons.slammerFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.slammer.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.slammer.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.buttons.leviathanCruiserAdd.setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.leviathan.cost > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.leviathan.rating > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.buttons.hunterCruiserAdd   .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.hunter.cost    > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.hunter.rating    > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
   }
 
   setSelectorMenu(value){
@@ -443,21 +454,21 @@ class GameInterface extends Phaser.Scene{
 }
 
 class RectLabelButton extends Phaser.GameObjects.Text{
-  constructor(scene,text,textStyle,textalpha,x,y,width,height,fillColor,fillAlpha,interfaceComponent){
+  constructor(scene,text,textStyle,textalpha,x,y,width,height,fillColor,fillAlpha){
     console.log("Adding Button");
     super(scene,x,y,text,textStyle)
 
     this.scene = scene
     this.body = this.scene.add.rectangle(x,y,width,height,fillColor,fillAlpha)
-    this.interfaceComponent =  interfaceComponent || {id: "base", group: "base", primary: false}
+
     this.setOrigin(0.5,0.5)
     this.setDepth(320)
     this.body.setDepth(300)
     this.scene.add.existing(this.body)
     this.scene.add.existing(this)
   }
-  setInteractive(config){
-    this.body.setInteractive(config)
+  setInteractive(interfaceComponentconfig, inputConfig){
+    this.body.setInteractive(inputConfig)
     return this
   }
 
@@ -480,9 +491,6 @@ class CircleLabelButton extends Phaser.GameObjects.Text{
 
     this.scene = scene
     this.body = this.scene.add.circle(x,y,radius,fillColor,fillAlpha)
-    this.hitGeom = new Phaser.Geom.Circle(x,y,radius)
-    console.log(this.hitGeom);
-
     this.setOrigin(0.5)
     this.setDepth(320)
     this.body.setDepth(300)

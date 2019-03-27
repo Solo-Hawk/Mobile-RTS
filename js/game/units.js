@@ -7,4 +7,6 @@ class Interactable extends Phaser.GameObjects.Sprite{
     super(scene, x, y, texture)
     this.type = type || "interactable"
   }
+
+  
 }
