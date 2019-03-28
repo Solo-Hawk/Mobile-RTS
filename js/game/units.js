@@ -67,7 +67,7 @@ class Steerable extends Interactable{
     this.linearVelocity.x += velocity.x
     this.linearVelocity.y += velocity.y
   }
-    
+
   idle(){
     this.desiredVelocity = this.linearVelocity.clone().scale(0.9)
     this.setLinearVelocity(this.desiredVelocity)
@@ -78,6 +78,7 @@ class Steerable extends Interactable{
     this.rotationLock = true
     var force = gametools.utils.vector.vector2d(0,0)
     var distance;
+
 
     this.desiredVelocity = target.clone().subtract(this.position)
     distance = this.desiredVelocity.length()
