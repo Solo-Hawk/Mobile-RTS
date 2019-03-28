@@ -2,8 +2,10 @@ class GameInterface extends Phaser.Scene{
   constructor(){
     super("game-interface");
   }
+
   init(gameScene){
     this.gameScene = gameScene;
+    console.log(this.gameScene, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     this.textStyles = {
         main:{
           fontSize: '40px',
@@ -98,7 +100,7 @@ class GameInterface extends Phaser.Scene{
     this.values.game = {
         constructionUnits: 1000
       }
-    this.buttons = {}
+    this.ui = {}
   }
 
   preload(){
@@ -112,28 +114,59 @@ class GameInterface extends Phaser.Scene{
     this.events.on("set-focus", (interfaceComponent)=>{
       this.setFocus(interfaceComponent)
     }, this)
-
+    this.createGameUI()
+    this.createControlPanelUI()
     this.createFactoryUI()
   }
+
   update(delta, time){
-    this.buttons.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
+    this.ui.game.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
   }
 
-  setFocus(focus){
-    console.log(focus);
-    console.log(focus.type);
+  setFocus(context){
+    console.log(context);
+    console.log(context.type);
+    switch (focus.type) {
+      case "unit":
+        this.openControlPanel(context.formation)
+        break;
+
+    }
+
+  }
+  createGameUI(){
+    this.ui.game = {}
+    this.ui.game.constructionUnitsLabel = new RectLabelButton(this,"0 CU"         , this.textStyles.sub, 1, 105 , 40 , 180, 40, 0x007777, 1)
+  }
+  createControlPanelUI(){
+    this.ui.unitPanel = {}
+    this.ui.unitPanel.panel = this.add.rectangle(config.width/2 , config.height - 115, 1600, 230, 0x8888ff,1)
+    this.ui.unitPanel.deselectButton = new RectLabelButton(this, "Deselect", this.textStyles.main,1,(config.width/2)+700,config.height - 115, 200,230,0xaaaaaa,1)
+    this.ui.unitPanel.deselectButton.setOrigin(0.5,0.5)
+    this.ui.unitPanel.deselectButton.setInteractive().on("pointerdown", ()=>{
+      this.closeControlPanel()
+    })
+  }
+
+  openControlPanel(context){
+    console.log("Open");
+  }
+
+  closeControlPanel(){
+    console.log("Closing");
   }
 
   createFactoryUI(){
+    this.ui.factory = {}
     //Factory UI Button System
     var x = 10;
     console.log(this);
     var y = config.height - 10;
 
 
-    this.buttons.factoryButton = new CircleLabelButton(this,"Build", this.textStyles.main, 1, x, y, 220, 0x0000ff, 1)
-    this.buttons.factoryButton.setOrigin(-0.25,1.50)
-    this.buttons.factoryButton.setInteractive().on("pointerdown", ()=>{
+    this.ui.factory.factoryButton = new CircleLabelButton(this,"Build", this.textStyles.main, 1, x, y, 220, 0x0000ff, 1)
+    this.ui.factory.factoryButton.setOrigin(-0.25,1.50)
+    this.ui.factory.factoryButton.setInteractive().on("pointerdown", ()=>{
       if(this.values.factory.open){
         this.events.emit("set-focus", {type:"unit-factory"})
         this.values.factory.open = false
@@ -152,85 +185,83 @@ class GameInterface extends Phaser.Scene{
 
 
 
-    this.buttons.fighterButton               = new CircleLabelButton(this, "Fighters", this.textStyles.sub        , 1, x+75        , y-300        , 80, 0x0000ff, 1)
-    var fib={x: this.buttons.fighterButton.x, y: this.buttons.fighterButton.y}
+    this.ui.factory.fighterButton               = new CircleLabelButton(this, "Fighters", this.textStyles.sub        , 1, x+75        , y-300        , 80, 0x0000ff, 1)
+    var fib={x: this.ui.factory.fighterButton.x, y: this.ui.factory.fighterButton.y}
 
-    this.buttons.lightFighterAdd             = new CircleLabelButton(this,""         , this.textStyles.description, 1, fib.x       , fib.y-160    , 60, 0x0000ff, 1)
-    this.buttons.lightFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+70    , fib.y-160-70 , 34, 0xff0000, 1)
-    this.buttons.lightFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x       , fib.y-60     , 20, 0xff0000, 0)
+    this.ui.factory.lightFighterAdd             = new CircleLabelButton(this,""         , this.textStyles.description, 1, fib.x       , fib.y-160    , 60, 0x0000ff, 1)
+    this.ui.factory.lightFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+70    , fib.y-160-70 , 34, 0xff0000, 1)
+    this.ui.factory.lightFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x       , fib.y-60     , 20, 0xff0000, 0)
 
-    this.buttons.heavyFighterAdd             = new CircleLabelButton(this, ""        , this.textStyles.description, 1, fib.x+120   , fib.y-96     , 60, 0x0000ff, 1)
-    this.buttons.heavyFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+120+70, fib.y-96-70  , 34, 0xff0000, 1)
-    this.buttons.heavyFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x+48    , fib.y-34     , 20, 0xff0000, 0)
-
-
-    this.buttons.frigateButton               = new CircleLabelButton(this, "Frigates", this.textStyles.sub        , 1, x+220       , y-220        , 80, 0x0000ff, 1)
-    var frb={x: this.buttons.frigateButton.x, y: this.buttons.frigateButton.y}
-
-    this.buttons.swatterFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x       , frb.y-160    , 60, 0x0000ff, 1)
-    this.buttons.swatterFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+70    , frb.y-160-70 , 34, 0xff0000, 1)
-    this.buttons.swatterFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x       , frb.y-60     , 20, 0xff0000, 0)
-
-    this.buttons.bastionFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+114    , frb.y-114   , 60, 0x0000ff, 1)
-    this.buttons.bastionFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+114+70 , frb.y-114-70, 34, 0xff0000, 1)
-    this.buttons.bastionFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+40    , frb.y-40     , 20, 0xff0000, 0)
-
-    this.buttons.slammerFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+160   , frb.y        , 60, 0x0000ff, 1)
-    this.buttons.slammerFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+160+70, frb.y-70     , 34, 0xff0000, 1)
-    this.buttons.slammerFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+60    , frb.y        , 20, 0xff0000, 0)
+    this.ui.factory.heavyFighterAdd             = new CircleLabelButton(this, ""        , this.textStyles.description, 1, fib.x+120   , fib.y-96     , 60, 0x0000ff, 1)
+    this.ui.factory.heavyFighterRemove          = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, fib.x+120+70, fib.y-96-70  , 34, 0xff0000, 1)
+    this.ui.factory.heavyFighterLabel           = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, fib.x+48    , fib.y-34     , 20, 0xff0000, 0)
 
 
-    this.buttons.cruiserButton               = new CircleLabelButton(this, "Cruisers", this.textStyles.sub        , 1, x+300       , y-75         , 80, 0x0000ff, 1)
-    var crb={x: this.buttons.cruiserButton.x, y: this.buttons.cruiserButton.y}
+    this.ui.factory.frigateButton               = new CircleLabelButton(this, "Frigates", this.textStyles.sub        , 1, x+220       , y-220        , 80, 0x0000ff, 1)
+    var frb={x: this.ui.factory.frigateButton.x, y: this.ui.factory.frigateButton.y}
 
-    this.buttons.leviathanCruiserAdd         = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+96    , crb.y-120    , 60, 0x0000ff, 1)
-    this.buttons.leviathanCruiserRemove      = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+96+70 , crb.y-120-70 , 34, 0xff0000, 1)
-    this.buttons.leviathanCruiserLabel       = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+34    , crb.y-58     , 20, 0xff0000, 0)
+    this.ui.factory.swatterFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x       , frb.y-160    , 60, 0x0000ff, 1)
+    this.ui.factory.swatterFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+70    , frb.y-160-70 , 34, 0xff0000, 1)
+    this.ui.factory.swatterFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x       , frb.y-60     , 20, 0xff0000, 0)
 
-    this.buttons.hunterCruiserAdd            = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+160   , crb.y        , 60, 0x0000ff, 1)
-    this.buttons.hunterCruiserRemove         = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+160+70, crb.y-70     , 34, 0xff0000, 1)
-    this.buttons.hunterCruiserLabel          = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+60    , crb.y        , 20, 0xff0000, 0)
+    this.ui.factory.bastionFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+114    , frb.y-114   , 60, 0x0000ff, 1)
+    this.ui.factory.bastionFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+114+70 , frb.y-114-70, 34, 0xff0000, 1)
+    this.ui.factory.bastionFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+40    , frb.y-40     , 20, 0xff0000, 0)
 
-
-    this.buttons.lightFighterAdd    .setText(this.values.config.fighters.light.rating     +"r\nLight\n"     +this.values.config.fighters.light.cost      +"CU")
-    this.buttons.heavyFighterAdd    .setText(this.values.config.fighters.heavy.rating     +"r\nHeavy\n"     +this.values.config.fighters.heavy.cost      +"CU")
-    this.buttons.swatterFrigateAdd  .setText(this.values.config.frigates.swatter.rating   +"r\nSwatter\n"   +this.values.config.frigates.swatter.cost    +"CU")
-    this.buttons.bastionFrigateAdd  .setText(this.values.config.frigates.bastion.rating   +"r\nBastion\n"   +this.values.config.frigates.bastion.cost    +"CU")
-    this.buttons.slammerFrigateAdd  .setText(this.values.config.frigates.slammer.rating   +"r\nSlammer\n"   +this.values.config.frigates.slammer.cost    +"CU")
-    this.buttons.leviathanCruiserAdd.setText(this.values.config.cruisers.leviathan.rating +"r\nLeviathan\n" +this.values.config.cruisers.leviathan.cost  +"CU")
-    this.buttons.hunterCruiserAdd   .setText(this.values.config.cruisers.hunter.rating    +"r\nHunter\n"    +this.values.config.cruisers.hunter.cost     +"CU")
+    this.ui.factory.slammerFrigateAdd           = new CircleLabelButton(this, ""        , this.textStyles.description, 1, frb.x+160   , frb.y        , 60, 0x0000ff, 1)
+    this.ui.factory.slammerFrigateRemove        = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, frb.x+160+70, frb.y-70     , 34, 0xff0000, 1)
+    this.ui.factory.slammerFrigateLabel         = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, frb.x+60    , frb.y        , 20, 0xff0000, 0)
 
 
-    this.buttons.fighterButton          .setInteractive().on("pointerdown", ()=>{this.setFighterMenu(true);})
-    this.buttons.lightFighterAdd        .setInteractive().on("pointerdown", ()=>{this.changeLightFighter(1);})
-    this.buttons.lightFighterRemove     .setInteractive().on("pointerdown", ()=>{this.changeLightFighter(-1);})
-    this.buttons.heavyFighterAdd        .setInteractive().on("pointerdown", ()=>{this.changeHeavyFighter(1);})
-    this.buttons.heavyFighterRemove     .setInteractive().on("pointerdown", ()=>{this.changeHeavyFighter(-1);})
+    this.ui.factory.cruiserButton               = new CircleLabelButton(this, "Cruisers", this.textStyles.sub        , 1, x+300       , y-75         , 80, 0x0000ff, 1)
+    var crb={x: this.ui.factory.cruiserButton.x, y: this.ui.factory.cruiserButton.y}
 
-    this.buttons.frigateButton          .setInteractive().on("pointerdown", ()=>{this.setFrigateMenu(true);})
-    this.buttons.swatterFrigateAdd      .setInteractive().on("pointerdown", ()=>{this.changeSwatterFrigate(1);})
-    this.buttons.swatterFrigateRemove   .setInteractive().on("pointerdown", ()=>{this.changeSwatterFrigate(-1);})
-    this.buttons.bastionFrigateAdd      .setInteractive().on("pointerdown", ()=>{this.changeBastionFrigate(1);})
-    this.buttons.bastionFrigateRemove   .setInteractive().on("pointerdown", ()=>{this.changeBastionFrigate(-1);})
-    this.buttons.slammerFrigateAdd      .setInteractive().on("pointerdown", ()=>{this.changeSlammerFrigate(1);})
-    this.buttons.slammerFrigateRemove   .setInteractive().on("pointerdown", ()=>{this.changeSlammerFrigate(-1);})
+    this.ui.factory.leviathanCruiserAdd         = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+96    , crb.y-120    , 60, 0x0000ff, 1)
+    this.ui.factory.leviathanCruiserRemove      = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+96+70 , crb.y-120-70 , 34, 0xff0000, 1)
+    this.ui.factory.leviathanCruiserLabel       = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+34    , crb.y-58     , 20, 0xff0000, 0)
 
-    this.buttons.cruiserButton          .setInteractive().on("pointerdown", ()=>{this.setCruiserMenu(true);})
-    this.buttons.hunterCruiserAdd       .setInteractive().on("pointerdown", ()=>{this.changeHunterCruiser(1);})
-    this.buttons.hunterCruiserRemove    .setInteractive().on("pointerdown", ()=>{this.changeHunterCruiser(-1);})
-    this.buttons.leviathanCruiserAdd    .setInteractive().on("pointerdown", ()=>{this.changeLeviathanCruiser(1);})
-    this.buttons.leviathanCruiserRemove .setInteractive().on("pointerdown", ()=>{this.changeLeviathanCruiser(-1);})
+    this.ui.factory.hunterCruiserAdd            = new CircleLabelButton(this, ""        , this.textStyles.description, 1, crb.x+160   , crb.y        , 60, 0x0000ff, 1)
+    this.ui.factory.hunterCruiserRemove         = new CircleLabelButton(this, "-"       , this.textStyles.remove     , 1, crb.x+160+70, crb.y-70     , 34, 0xff0000, 1)
+    this.ui.factory.hunterCruiserLabel          = new CircleLabelButton(this, "0"       , this.textStyles.count      , 1, crb.x+60    , crb.y        , 20, 0xff0000, 0)
 
-    this.buttons.constructionUnitsLabel = new RectLabelButton(this,"0 CU"         , this.textStyles.sub, 1, 105 , 40 , 180, 40, 0x007777, 1)
 
-    this.buttons.launchButton = new CircleLabelButton(this,"Launch", this.textStyles.main, 1, 110, 170, 90, 0xff00ff, 1)
-    this.buttons.launchButton.setOrigin(0.5,0.5)
-    this.buttons.launchButton.setInteractive().on("pointerdown", ()=>{
+    this.ui.factory.lightFighterAdd    .setText(this.values.config.fighters.light.rating     +"r\nLight\n"     +this.values.config.fighters.light.cost      +"CU")
+    this.ui.factory.heavyFighterAdd    .setText(this.values.config.fighters.heavy.rating     +"r\nHeavy\n"     +this.values.config.fighters.heavy.cost      +"CU")
+    this.ui.factory.swatterFrigateAdd  .setText(this.values.config.frigates.swatter.rating   +"r\nSwatter\n"   +this.values.config.frigates.swatter.cost    +"CU")
+    this.ui.factory.bastionFrigateAdd  .setText(this.values.config.frigates.bastion.rating   +"r\nBastion\n"   +this.values.config.frigates.bastion.cost    +"CU")
+    this.ui.factory.slammerFrigateAdd  .setText(this.values.config.frigates.slammer.rating   +"r\nSlammer\n"   +this.values.config.frigates.slammer.cost    +"CU")
+    this.ui.factory.leviathanCruiserAdd.setText(this.values.config.cruisers.leviathan.rating +"r\nLeviathan\n" +this.values.config.cruisers.leviathan.cost  +"CU")
+    this.ui.factory.hunterCruiserAdd   .setText(this.values.config.cruisers.hunter.rating    +"r\nHunter\n"    +this.values.config.cruisers.hunter.cost     +"CU")
+
+
+    this.ui.factory.fighterButton          .setInteractive().on("pointerdown", ()=>{this.setFighterMenu(true);})
+    this.ui.factory.lightFighterAdd        .setInteractive().on("pointerdown", ()=>{this.changeLightFighter(1);})
+    this.ui.factory.lightFighterRemove     .setInteractive().on("pointerdown", ()=>{this.changeLightFighter(-1);})
+    this.ui.factory.heavyFighterAdd        .setInteractive().on("pointerdown", ()=>{this.changeHeavyFighter(1);})
+    this.ui.factory.heavyFighterRemove     .setInteractive().on("pointerdown", ()=>{this.changeHeavyFighter(-1);})
+
+    this.ui.factory.frigateButton          .setInteractive().on("pointerdown", ()=>{this.setFrigateMenu(true);})
+    this.ui.factory.swatterFrigateAdd      .setInteractive().on("pointerdown", ()=>{this.changeSwatterFrigate(1);})
+    this.ui.factory.swatterFrigateRemove   .setInteractive().on("pointerdown", ()=>{this.changeSwatterFrigate(-1);})
+    this.ui.factory.bastionFrigateAdd      .setInteractive().on("pointerdown", ()=>{this.changeBastionFrigate(1);})
+    this.ui.factory.bastionFrigateRemove   .setInteractive().on("pointerdown", ()=>{this.changeBastionFrigate(-1);})
+    this.ui.factory.slammerFrigateAdd      .setInteractive().on("pointerdown", ()=>{this.changeSlammerFrigate(1);})
+    this.ui.factory.slammerFrigateRemove   .setInteractive().on("pointerdown", ()=>{this.changeSlammerFrigate(-1);})
+
+    this.ui.factory.cruiserButton          .setInteractive().on("pointerdown", ()=>{this.setCruiserMenu(true);})
+    this.ui.factory.hunterCruiserAdd       .setInteractive().on("pointerdown", ()=>{this.changeHunterCruiser(1);})
+    this.ui.factory.hunterCruiserRemove    .setInteractive().on("pointerdown", ()=>{this.changeHunterCruiser(-1);})
+    this.ui.factory.leviathanCruiserAdd    .setInteractive().on("pointerdown", ()=>{this.changeLeviathanCruiser(1);})
+    this.ui.factory.leviathanCruiserRemove .setInteractive().on("pointerdown", ()=>{this.changeLeviathanCruiser(-1);})
+
+    this.ui.factory.launchButton = new CircleLabelButton(this,"Launch", this.textStyles.main, 1, 110, 170, 90, 0xff00ff, 1)
+    this.ui.factory.launchButton.setOrigin(0.5,0.5)
+    this.ui.factory.launchButton.setInteractive().on("pointerdown", ()=>{
       this.launchFormation()
     });
-    this.buttons.formationCapacityCount = new RectLabelButton(this,"Units: 0/30"  , this.textStyles.sub, 1, 105, 300, 180, 40, 0x0000ff, 1)
-    this.buttons.formationRating        = new RectLabelButton(this,"Rating: 0/180", this.textStyles.sub, 1, 105, 340, 180, 40, 0x0000ff, 1)
-    this.buttons.formationCost          = new RectLabelButton(this,"Cost: 0 CU"   , this.textStyles.sub, 1, 105, 380, 180, 40, 0x0000ff, 1)
+    this.ui.factory.formationCapacityCount = new RectLabelButton(this,"Units: 0/30"  , this.textStyles.sub, 1, 105, 300, 180, 40, 0x0000ff, 1)
+    this.ui.factory.formationRating        = new RectLabelButton(this,"Rating: 0/180", this.textStyles.sub, 1, 105, 340, 180, 40, 0x0000ff, 1)
+    this.ui.factory.formationCost          = new RectLabelButton(this,"Cost: 0 CU"   , this.textStyles.sub, 1, 105, 380, 180, 40, 0x0000ff, 1)
 
 
     this.setSelectorMenu(false)
@@ -364,6 +395,7 @@ class GameInterface extends Phaser.Scene{
 
   launchFormation(){
     console.log("launch");
+    // TODO: Call gamemanager and create formation
     this.values.factory.fighters.light     = 0
     this.values.factory.fighters.heavy     = 0
     this.values.factory.frigates.swatter   = 0
@@ -386,95 +418,92 @@ class GameInterface extends Phaser.Scene{
 
   updateLabels(){
     // This is hardcoded for simplicity, I wrote most of this in mind with multicursor so the time it took is minimal compared to making it flexible code
-    console.log(this.buttons.factoryButton);
+    console.log(this.ui.factory.factoryButton);
     console.log(this.values.factory.rating);
-    this.buttons.lightFighterLabel      .setText(this.values.factory.fighters.light)
-    this.buttons.heavyFighterLabel      .setText(this.values.factory.fighters.heavy)
-    this.buttons.swatterFrigateLabel    .setText(this.values.factory.frigates.swatter)
-    this.buttons.bastionFrigateLabel    .setText(this.values.factory.frigates.bastion)
-    this.buttons.slammerFrigateLabel    .setText(this.values.factory.frigates.slammer)
-    this.buttons.hunterCruiserLabel     .setText(this.values.factory.cruisers.hunter)
-    this.buttons.leviathanCruiserLabel  .setText(this.values.factory.cruisers.leviathan)
+    this.ui.factory.lightFighterLabel      .setText(this.values.factory.fighters.light)
+    this.ui.factory.heavyFighterLabel      .setText(this.values.factory.fighters.heavy)
+    this.ui.factory.swatterFrigateLabel    .setText(this.values.factory.frigates.swatter)
+    this.ui.factory.bastionFrigateLabel    .setText(this.values.factory.frigates.bastion)
+    this.ui.factory.slammerFrigateLabel    .setText(this.values.factory.frigates.slammer)
+    this.ui.factory.hunterCruiserLabel     .setText(this.values.factory.cruisers.hunter)
+    this.ui.factory.leviathanCruiserLabel  .setText(this.values.factory.cruisers.leviathan)
 
-    this.buttons.formationCapacityCount .setText("Units: "+ this.values.factory.capacity + "/30").setColor(this.values.factory.capacity == this.values.config.formation.maxCapacity ? "#ff2222" : "#ffffff")
-    this.buttons.formationRating        .setText("Rating: "+ this.values.factory.rating + "/180").setColor(this.values.factory.rating   == this.values.config.formation.maxRating   ? "#ff2222" : "#ffffff")
-    this.buttons.formationCost          .setText("Cost: "+ this.values.factory.cost + " CU")     .setColor(this.values.factory.cost     >=  this.values.game.constructionUnits      ? "#ff2222" : "#ffffff")
+    this.ui.factory.formationCapacityCount .setText("Units: "+ this.values.factory.capacity + "/30").setColor(this.values.factory.capacity == this.values.config.formation.maxCapacity ? "#ff2222" : "#ffffff")
+    this.ui.factory.formationRating        .setText("Rating: "+ this.values.factory.rating + "/180").setColor(this.values.factory.rating   == this.values.config.formation.maxRating   ? "#ff2222" : "#ffffff")
+    this.ui.factory.formationCost          .setText("Cost: "+ this.values.factory.cost + " CU")     .setColor(this.values.factory.cost     >=  this.values.game.constructionUnits      ? "#ff2222" : "#ffffff")
 
-    this.buttons.fighterButton.setColor(
+    this.ui.factory.fighterButton.setColor(
       (this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.light.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.light.rating     > this.values.config.formation.maxRating)&&
       (this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.heavy.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.heavy.rating     > this.values.config.formation.maxRating)
       ? "#ff2222" : "#ffffff")
-    this.buttons.frigateButton.setColor(
+    this.ui.factory.frigateButton.setColor(
       (this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.swatter.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.swatter.rating   > this.values.config.formation.maxRating)&&
       (this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.bastion.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.bastion.rating   > this.values.config.formation.maxRating)&&
       (this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.slammer.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.slammer.rating   > this.values.config.formation.maxRating)
       ? "#ff2222" : "#ffffff")
-    this.buttons.cruiserButton.setColor(
+    this.ui.factory.cruiserButton.setColor(
       (this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.leviathan.cost > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.leviathan.rating > this.values.config.formation.maxRating)&&
       (this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.hunter.cost    > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.hunter.rating    > this.values.config.formation.maxRating)
       ? "#ff2222" : "#ffffff"
     )
 
-    this.buttons.lightFighterAdd    .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.light.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.light.rating     > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
-    this.buttons.heavyFighterAdd    .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.heavy.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.heavy.rating     > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
-    this.buttons.swatterFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.swatter.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.swatter.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
-    this.buttons.bastionFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.bastion.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.bastion.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
-    this.buttons.slammerFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.slammer.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.slammer.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
-    this.buttons.leviathanCruiserAdd.setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.leviathan.cost > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.leviathan.rating > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
-    this.buttons.hunterCruiserAdd   .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.hunter.cost    > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.hunter.rating    > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.ui.factory.lightFighterAdd    .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.light.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.light.rating     > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.ui.factory.heavyFighterAdd    .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.fighters.heavy.cost     > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.fighters.heavy.rating     > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.ui.factory.swatterFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.swatter.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.swatter.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.ui.factory.bastionFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.bastion.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.bastion.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.ui.factory.slammerFrigateAdd  .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.frigates.slammer.cost   > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.frigates.slammer.rating   > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.ui.factory.leviathanCruiserAdd.setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.leviathan.cost > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.leviathan.rating > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
+    this.ui.factory.hunterCruiserAdd   .setColor(this.values.factory.capacity + 1 > 30 || this.values.factory.cost + this.values.config.cruisers.hunter.cost    > this.values.game.constructionUnits || this.values.factory.rating + this.values.config.cruisers.hunter.rating    > this.values.config.formation.maxRating ? "#ff2222" : "#ffffff")
   }
 
   setSelectorMenu(value){
-    this.buttons.fighterButton          .setVisible(value)
-    this.buttons.frigateButton          .setVisible(value)
-    this.buttons.cruiserButton          .setVisible(value)
-    this.buttons.launchButton           .setVisible(value)
-    this.buttons.formationCapacityCount .setVisible(value)
-    this.buttons.formationRating        .setVisible(value)
-    this.buttons.formationCost          .setVisible(value)
+    this.ui.factory.fighterButton          .setVisible(value)
+    this.ui.factory.frigateButton          .setVisible(value)
+    this.ui.factory.cruiserButton          .setVisible(value)
+    this.ui.factory.launchButton           .setVisible(value)
+    this.ui.factory.formationCapacityCount .setVisible(value)
+    this.ui.factory.formationRating        .setVisible(value)
+    this.ui.factory.formationCost          .setVisible(value)
   }
   setFighterMenu(value){
-    this.buttons.lightFighterAdd       .setVisible(value)
-    this.buttons.lightFighterRemove    .setVisible(value)
-    this.buttons.lightFighterLabel     .setVisible(this.values.factory.open)
-    this.buttons.heavyFighterAdd       .setVisible(value)
-    this.buttons.heavyFighterRemove    .setVisible(value)
-    this.buttons.heavyFighterLabel     .setVisible(this.values.factory.open)
+    this.ui.factory.lightFighterAdd       .setVisible(value)
+    this.ui.factory.lightFighterRemove    .setVisible(value)
+    this.ui.factory.lightFighterLabel     .setVisible(this.values.factory.open)
+    this.ui.factory.heavyFighterAdd       .setVisible(value)
+    this.ui.factory.heavyFighterRemove    .setVisible(value)
+    this.ui.factory.heavyFighterLabel     .setVisible(this.values.factory.open)
     if(value){
       this.setFrigateMenu(false)
       this.setCruiserMenu(false)
     }
   }
   setFrigateMenu(value){
-    this.buttons.swatterFrigateAdd    .setVisible(value)
-    this.buttons.swatterFrigateRemove .setVisible(value)
-    this.buttons.swatterFrigateLabel  .setVisible(this.values.factory.open)
-    this.buttons.bastionFrigateAdd    .setVisible(value)
-    this.buttons.bastionFrigateRemove .setVisible(value)
-    this.buttons.bastionFrigateLabel  .setVisible(this.values.factory.open)
-    this.buttons.slammerFrigateAdd    .setVisible(value)
-    this.buttons.slammerFrigateRemove .setVisible(value)
-    this.buttons.slammerFrigateLabel  .setVisible(this.values.factory.open)
+    this.ui.factory.swatterFrigateAdd    .setVisible(value)
+    this.ui.factory.swatterFrigateRemove .setVisible(value)
+    this.ui.factory.swatterFrigateLabel  .setVisible(this.values.factory.open)
+    this.ui.factory.bastionFrigateAdd    .setVisible(value)
+    this.ui.factory.bastionFrigateRemove .setVisible(value)
+    this.ui.factory.bastionFrigateLabel  .setVisible(this.values.factory.open)
+    this.ui.factory.slammerFrigateAdd    .setVisible(value)
+    this.ui.factory.slammerFrigateRemove .setVisible(value)
+    this.ui.factory.slammerFrigateLabel  .setVisible(this.values.factory.open)
     if(value){
       this.setFighterMenu(false)
       this.setCruiserMenu(false)
     }
   }
   setCruiserMenu(value){
-    this.buttons.hunterCruiserAdd       .setVisible(value)
-    this.buttons.hunterCruiserRemove    .setVisible(value)
-    this.buttons.hunterCruiserLabel     .setVisible(this.values.factory.open)
-    this.buttons.leviathanCruiserAdd    .setVisible(value)
-    this.buttons.leviathanCruiserRemove .setVisible(value)
-    this.buttons.leviathanCruiserLabel  .setVisible(this.values.factory.open)
+    this.ui.factory.hunterCruiserAdd       .setVisible(value)
+    this.ui.factory.hunterCruiserRemove    .setVisible(value)
+    this.ui.factory.hunterCruiserLabel     .setVisible(this.values.factory.open)
+    this.ui.factory.leviathanCruiserAdd    .setVisible(value)
+    this.ui.factory.leviathanCruiserRemove .setVisible(value)
+    this.ui.factory.leviathanCruiserLabel  .setVisible(this.values.factory.open)
     if(value){
       this.setFighterMenu(false)
       this.setFrigateMenu(false)
     }
   }
-
-
-
 
 }
 
