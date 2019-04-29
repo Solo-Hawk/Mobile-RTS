@@ -3,24 +3,57 @@ class SceneLevelDevelopment extends Phaser.Scene{
     super("level-development")
   }
   preload(){
-    this.scene.run("game-interface")
-    this.userInterface = this.scene.get("game-interface")
-    this.gameManager = new GameManager(this, this.userInterface)
+    this.gameManager = new GameManager(this)
+
   }
   create(){
-    this.gameManager.create()
+    console.log("CREATED HERE");
+    this.units = {
+      test:{
+      }
+    }
+    // this.units.test.first = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, 500,800)
+    // this.units.test.firstTarget = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, 700,200)
+    // this.units.test.turret = this.gameManager.create.heavyFighter(Game.Utils.statics.teams.COMPUTER, 1500, 300)
+    // this.units.test.turret.maxLinearSpeed = 1200;
+    // this.units.test.turret.maxLinearAcceleration = 50;
+    // this.units.test.turret.formation.setObjective(this.units.test.first)
+    // console.log(this.units.test.turret.formation);
+    // this.units.test.turret.addAttachment(new Turret(this.units.test.turret, 'missle-red'))
+    // this.units.test.first.formation.setObjective(this.units.test.turret)
+    // this.units.test.first.addAttachment(new Gun(this.units.test.first, 'missle-red',10,40))
+    // setTimeout((scene)=>{
+    //   scene.units.test.turret.formation.setObjective()
+    //   console.log("Obj Changed");
+    // },20000,this)
 
-    var unit = new Interactable(this.gameManager, this, 0,0, "1Heavy", "unit")
-    this.gameCamera = this.cameras.main
-    this.gameCamera.setScroll(-config.width/2,-config.height/2)
+    for(var i = 0; i < 10; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -8000),Phaser.Math.Between(-4000, 4000))
+      unit.addAttachment(new Gun(unit, 'missle-red',0,0))
+    }
 
-    console.log(this.gameCamera);
+    for(var i = 0; i < 10; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(8000,8500),Phaser.Math.Between(-4000, 4000))
+      unit.addAttachment(new Gun(unit, 'missle-red',0,0))
+    }
 
+    this.gameManager.sort()
+
+    for(var i = 0; i < this.gameManager.player.length; i++){
+      this.gameManager.player[i].formation.setObjective(this.gameManager.comp[Phaser.Math.Between(0,this.gameManager.comp.length-1)])
+    }
+    for(var i = 0; i < this.gameManager.comp.length; i++){
+      this.gameManager.comp[i].formation.setObjective(this.gameManager.player[Phaser.Math.Between(0,this.gameManager.player.length-1)])
+    }
+    var camera = this.cameras.getCamera("");
+
+    camera.setZoom(0.24)
   }
 
 
   update(delta,time){
-    this.gameManager.update(delta,time)
+    console.clear()
+    this.gameManager.update()
   }
 
 

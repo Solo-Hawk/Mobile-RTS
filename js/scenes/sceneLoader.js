@@ -1,3 +1,13 @@
+var resources = [
+  ['heavy-fighter-red' , 'assets/ships/red/enemyRed4.png'],
+  ['heavy-fighter-blue', 'assets/ships/blue/enemyBlue4.png'],
+  ['light-fighter-red' , 'assets/ships/red/enemyRed3.png'],
+  ['light-fighter-blue', 'assets/ships/blue/enemyBlue3.png'],
+  ['home-base-red'     , 'assets/buildings/home_blue.png'],
+  ['home-base-blue'    , 'assets/buildings/home_red.png'],
+  ['missle-red', 'assets/missles/spaceMissiles_009.png'],
+  ['missle-blue', 'assets/missles/spaceMissiles_010.png']
+]
 class SceneLoader extends Phaser.Scene{
   constructor(){
     super("loader")
@@ -5,17 +15,13 @@ class SceneLoader extends Phaser.Scene{
   preload(){
     console.log(this);
     this.createProgressBar.call(this)
-
     // All Main Assets are loaded here
 
+    resources.forEach((texture)=>{
+      this.load.image(texture[0], texture[1])
+    }, this)
 
 
-    this.load.image('1Heavy', 'assets/ship_blue_heavy.png');
-    this.load.image('2Heavy', 'assets/ship_red_heavy.png');
-    this.load.image('1Light', 'assets/ship_blue_light.png');
-    this.load.image('2Light', 'assets/ship_red_light.png');
-    this.load.image('1Home' , 'assets/home_blue.png');
-    this.load.image('2Home' , 'assets/home_red.png');
   }
   create(){
 
@@ -50,7 +56,7 @@ class SceneLoader extends Phaser.Scene{
         y: height / 2 - 5,
         text: '0%',
         style: {
-            font: '18px monospace',
+            font: '30px monospace',
             fill: '#ffffff'
         }
     });
@@ -58,14 +64,14 @@ class SceneLoader extends Phaser.Scene{
 
     var assetText = this.make.text({
         x: width / 2,
-        y: height / 2 + 65,
+        y: height / 2 - 5,
         text: '',
         style: {
-            font: '18px monospace',
+            font: '100px monospace',
             fill: '#ffffff'
         }
     });
-
+    console.log(assetText);
     assetText.setOrigin(0.5, 0.5);
 
     this.load.on('progress', function (value) {
@@ -76,8 +82,9 @@ class SceneLoader extends Phaser.Scene{
     });
 
     this.load.on('fileprogress', function (file) {
-        assetText.setText('Loading asset: ' + file.key);
+                assetText.setText('Loading asset: ' + file.src);
     });
+
     this.load.on('complete', function () {
         progressBar.destroy();
         progressBox.destroy();

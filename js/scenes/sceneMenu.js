@@ -1,4 +1,4 @@
-class SceneMenu extends Phaser.Scene{
+ class SceneMenu extends Phaser.Scene{
   constructor(){
     super("mainmenu")
 
@@ -52,7 +52,7 @@ class SceneMenu extends Phaser.Scene{
       .setInteractive({useHandCursor:true})
       .on('pointerover', () => {this.buttons.newGame.body.setFillStyle(0x3700B3);})
       .on('pointerout', () => {this.buttons.newGame.body.setFillStyle(0x6200EE);} )
-      .on('pointerdown', () => {this.scale.startFullscreen();this.scene.switch("level-development");} )
+      .on('pointerdown', () => {/*this.scale.startFullscreen();*/this.scale.scaleMode = Phaser.Scale.FIT;this.scene.switch("level-development");} )
       .on('pointerup', () => {this.buttons.newGame.body.setFillStyle(0x3700B3);}
     );
 
