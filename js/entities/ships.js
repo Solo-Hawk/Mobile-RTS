@@ -9,13 +9,14 @@ class BaseShip extends Steerable{
     this.team = team || Game.Utils.statics.teams.NEUTRAL;
     this.attachments = [];
     this.formation = scene.gameManager.create.formation(this.team, [this])
+    this.formationDisplacement =
     this.target = Game.Utils.statics.BLANK;
     this.mode = Game.Utils.statics.commands.IDLE
     this.ranges = {
-      attackRange : 3000,
-      evadeRange  :500,
-      returnRange : 3000,
-      engageRange : 6000
+      attackRange : 1500,
+      evadeRange  : 800,
+      returnRange : 4000,
+      engageRange : 3000
     }
 
     this.maxLinearSpeed = 3000
@@ -37,58 +38,56 @@ class BaseShip extends Steerable{
       // console.log("no target");
       return
     }
-
-    if(this.mode = Game.Utils.statics.commands.ATTACK){
-      var attackRange = this.ranges.attackRange
-      var evadeRange =  this.ranges.evadeRange
-      var returnRange = this.ranges.returnRange
-      var engageRange = this.ranges.engageRange
-      // console.log(this.distanceFrom(this.target));
-      console.log(this.state);
+    if(this.mode == Game.Utils.statics.commands.IDLE){
+      this.idle()
+    }
+    if(this.mode == Game.Utils.statics.commands.MOVE){
+      console.log("Move Mo");
+      this.seek(this.target.getPosition())
+    }
+    if(this.mode == Game.Utils.statics.commands.ATTACK){
+      // console.log(this.state);
       switch (this.state) {
         case 1:
-          // console.log("Pursuit");
-          this.pursuit(this.target)
-          if(this.distanceFrom(this.target) <= evadeRange){
-            this.state = 2
-          }
-          if(this.distanceFrom(this.target) > attackRange){
-            this.state = 3
+          // console.log("Pursuit to Target");
+          this.pursuit(this.target);
+          if(this.distanceFrom(this.target) <= this.linearVelocity.length()){
+            this.state = 2;
           }
           break;
         case 2:
-          // console.log("Evade");
+          // console.log("Evade to Target");
           this.evade(this.target)
-          // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
-          // this.wander()
-          if(this.distanceFrom(this.target) >= returnRange){
-            if(this.target.target == this){
-
-              this.state = 3
-            }else{
-              this.state = 1
+          this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
+          if(this.distanceFrom(this.target) >= this.ranges.returnRange){
+            this.state = 3
+          }else if(this.formation.flagship != this){
+            if(this.distanceFrom(this.formation.flagship) <= this.ranges.returnRange / 4){
+              this.state = 4
             }
           }
+
           break;
         case 3:
-          // console.log("Retreat");
-          this.seek(this.team == Game.Utils.statics.teams.PLAYER ?
-            new Game.Utils.vector2d(Phaser.Math.Between(-8500, -8000), Phaser.Math.Between(-4000, 4000)) :
-            new Game.Utils.vector2d(Phaser.Math.Between(8000, 8500), Phaser.Math.Between(-4000, 4000)))
-          if(this.distanceFrom(this.target) >= engageRange){
-            this.state = 4
-          }
-          break;
-        case 4:
-          // console.log("Moving to");
-          this.seek(this.target.getPosition(), 200)
-          if(this.distanceFrom(this.target) <= attackRange){
+          // console.log("Seeking to Target");
+          this.seek(this.target.getPosition(),100)
+          if(this.distanceFrom(this.target) <= this.ranges.attackRange){
             this.state = 1
           }
           break;
+        case 4:
+          // // console.log("Returning to FS", this.formation.flagship.getPosition());
+          this.seek(this.formation.flagship.getPosition(),0)
+          if(this.distanceFrom(this.formation.flagship) <= 800){
+            this.state = 3
+          }
+          this.state = 3
+          break;
 
       }
+
     }
+
 
     super.update()
     this.updateAttachments()

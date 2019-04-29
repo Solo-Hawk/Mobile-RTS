@@ -15,17 +15,16 @@ class Steerable extends Phaser.GameObjects.Sprite {
 
     this.rotationLock = true;
 
-    this.body.pos = new Game.Utils.vector2d(this.body.pos.x, this.body.pos.y)
+    this.body.pos = Game.Utils.vector2d(this.body.pos.x, this.body.pos.y)
     this.position = this.body.pos
-    this.body.vel = new Game.Utils.vector2d(0,0)
+    this.body.vel = Game.Utils.vector2d(0,0)
     this.linearVelocity = this.body.vel
-    this.desiredVelocity = new Game.Utils.vector2d(0,0)
-    this.steering = new Game.Utils.vector2d(0,0)
+    this.desiredVelocity = Game.Utils.vector2d(0,0)
+    this.steering = Game.Utils.vector2d(0,0)
     this.orientation = this.body.angle //In Radians
 
-    this.maxLinearSpeed = 3000;
-    this.maxLinearSpeed         = 50000;
-    this.maxLinearAcceleration  = 200;
+    this.maxLinearSpeed         = 6000;
+    this.maxLinearAcceleration  = 1200;
     this.maxAngularSpeed        = 12;
     this.maxAngularAcceleration = 7;
 
@@ -39,8 +38,8 @@ class Steerable extends Phaser.GameObjects.Sprite {
     // Wander Behaviour Vars
     this.displacement = 0;
     this.wanderReach = 20;
-    this.wanderPos = new Game.Utils.vector2d(0,0);
-    this.wanderForce = new Game.Utils.vector2d(0,0);
+    this.wanderPos = Game.Utils.vector2d(0,0);
+    this.wanderForce = Game.Utils.vector2d(0,0);
 
     //Steering Forces
     this.appliableForces = []
@@ -67,7 +66,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
   }
 
   setLinearVelocityLength(length){
-    this.linearVelocity.normalise().scale(1)
+    this.linearVelocity.normalise().scale(length)
   }
   distanceFrom(t){
     return t.getPosition().subtract(this.getPosition()).length()
@@ -80,11 +79,10 @@ class Steerable extends Phaser.GameObjects.Sprite {
     ))
   }
   applySteering(){
-    var pos = this.getPosition()
     // console.log(this.trace);
     this.trace.forEach((r)=>{r.destroy()})
     this.trace = []
-    var forceTotal  = new Game.Utils.vector2d(0,0);
+    var forceTotal  = Game.Utils.vector2d(0,0);
     for(var i = 0; i < this.lines.length; i++){
       this.lines[i].destroy()
     }
@@ -118,46 +116,45 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.alignRotation()
   }
   idle(){
-    var force = new Game.Utils.vector2d(0,0)
+    // console.log("idle");
+    var force = Game.Utils.vector2d(0,0)
     force.set(this.linearVelocity.x, this.linearVelocity.y)
     force.scale(0.9)
     this.setLinearVelocity(force)
   }
   seek(target, radius, brace){
-    var force = new Game.Utils.vector2d(0,0)
-    var distance;
+    // console.log("seek");
     this.desiredVelocity = target.subtract(this.getPosition())
-    distance = this.desiredVelocity.length()
+    var distance = this.desiredVelocity.length()
     this.desiredVelocity.normalise()
     if(distance <= radius + this.linearVelocity.length() && radius != 0){
       this.desiredVelocity.scale((this.linearVelocity.length() + this.maxLinearAcceleration) * (distance/(radius + this.linearVelocity.length())))
     }else{
       this.desiredVelocity.scale(this.linearVelocity.length() + this.maxLinearAcceleration)
     }
-    force = this.desiredVelocity.subtract(this.linearVelocity)
+    var force = this.desiredVelocity.subtract(this.linearVelocity)
     this.appliableForces.push(force)
 
   }
 
 
   flee(target){
-    var force = new Game.Utils.vector2d(0,0)
-    var distance;
+    // console.log("flee");
     this.desiredVelocity = target.subtract(this.getPosition())
-    distance = this.desiredVelocity.length()
+    var distance = this.desiredVelocity.length()
     this.desiredVelocity.normalise()
     this.desiredVelocity.scale((this.linearVelocity.length() + this.maxLinearAcceleration))
     this.desiredVelocity.scale(-1)
-    force = this.desiredVelocity.subtract(this.linearVelocity)
+    var force = this.desiredVelocity.subtract(this.linearVelocity)
     this.appliableForces.push(force)
     // console.log("Flee");
   }
   wander(range, points){
-
+    // console.log("wander");
     points = points || 10
     var force = this.linearVelocity.clone()
     for(var i = 0; i < points; i++){
-      var displace = new Game.Utils.vector2d(0,0)
+      var displace = Game.Utils.vector2d(0,0)
       displace.scale(Math.random()*2-1)
       displace.scale(this.maxLinearAcceleration)
 
@@ -170,9 +167,10 @@ class Steerable extends Phaser.GameObjects.Sprite {
     // console.log("Wander");
   }
   pursuit(target){
+    // console.log("pursuit");
     var t = target.getPosition().subtract(this.getPosition()).length()
     // console.log(s, target.linearVelocity.length());
-    var t = t / (this.maxLinearSpeed*3)
+    t = t / (this.maxLinearSpeed*3)
     // console.log(t);
     var futurePos = target.getPosition().add(target.linearVelocity.clone().scale(t))
     this.seek(futurePos,200)
@@ -180,6 +178,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     // console.log("Pursuit");
   }
   evade(target){
+    // console.log("evade");
     var distance = target.getPosition().subtract(this.getPosition()).length()
     var ahead = distance / this.maxLinearSpeed;
     this.flee(target.getPosition().add(target.linearVelocity.clone().scale(ahead)).scale(this.maxLinearAcceleration))

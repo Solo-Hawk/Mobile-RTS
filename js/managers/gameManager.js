@@ -8,19 +8,29 @@ class GameManager {
     this.emitters = []
     this.projectiles = []
     this.create = new Factory(this.scene, this)
+    this.tick = 0
   }
   update(){
+    if(this.tick == 0){
+      this.formations.forEach((formation)=>{
+        formation.update()
+        if(formation.ships.length == 0){
+          this.formations = Game.Utils.arrayRemove(this.formations, formation)
+        }
+      },this)
+    }
     this.ships.forEach((ship)=>{
       ship.update()
-    })
-    this.formations.forEach((formation)=>{
-      formation.update()
     })
     this.projectiles.forEach((projectile)=>{
       projectile.update()
     })
     if(this.ships.length > (this.player.length + this.comp.length)){
       this.sort()
+    }
+    this.tick++
+    if(this.tick >= 5){
+      this.tick = 0
     }
   }
   sort(){
@@ -41,6 +51,7 @@ class GameManager {
       }
     }, this)
   }
+
 }
 
 class Factory{
@@ -63,6 +74,7 @@ class Factory{
     var s = new Fighter(this.scene, x, y, 'light-fighter-'+this.getColor(team), team)
     s.rating = 10
     this.manager.ships.push(s)
+    this.manager.sort()
     return s
   }
   heavyFighter(team,x,y){
@@ -72,6 +84,7 @@ class Factory{
     var s = new Fighter(this.scene, x, y, 'heavy-fighter-'+this.getColor(team), team)
     s.rating = 30
     this.manager.ships.push(s)
+    this.manager.sort()
     return s
   }
   fighterGun(ship){

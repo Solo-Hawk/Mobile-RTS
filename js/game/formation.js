@@ -37,6 +37,7 @@ class Formation{
   }
 
   findFlagship(){
+    console.log("finding FS");
     for(var i = 0; i < this.ships.length; i++){
       console.log(this.ships[i].rating);
       if(this.ships[i].rating > this.flagship.rating || this.flagship == Game.Utils.statics.BLANK){
@@ -44,8 +45,17 @@ class Formation{
       }
     }
   }
-
-
+  addUnit(unit){
+    if(this.ships.indexOf(unit) == -1){
+      unit.formation.removeUnit(unit)
+      this.ships.push(unit)
+      unit.formation = this
+    }
+  }
+  removeUnit(unit){
+    unit.formation = Game.Utils.statics.BLANK
+    this.ships = Game.Utils.arrayRemove(this.ships, unit)
+  }
 
   setObjective(target){
     console.log(target);

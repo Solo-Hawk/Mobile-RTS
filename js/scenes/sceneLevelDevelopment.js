@@ -26,17 +26,37 @@ class SceneLevelDevelopment extends Phaser.Scene{
     //   scene.units.test.turret.formation.setObjective()
     //   console.log("Obj Changed");
     // },20000,this)
-
-    for(var i = 0; i < 10; i++){
-      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -8000),Phaser.Math.Between(-4000, 4000))
+    var formation;
+    for(var i = 0; i < 6; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -6000),Phaser.Math.Between(-4000, 4000))
+      this.gameManager.player[0].formation.addUnit(unit)
+      unit.addAttachment(new Gun(unit, 'missle-red',0,0))
+    }
+    for(var i = 0; i < 6; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -6000),Phaser.Math.Between(-4000, 4000))
+      this.gameManager.player[0].formation.addUnit(unit)
+      unit.addAttachment(new Gun(unit, 'missle-red',0,0))
+    }
+    for(var i = 0; i < 6; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -6000),Phaser.Math.Between(-4000, 4000))
+      this.gameManager.player[0].formation.addUnit(unit)
       unit.addAttachment(new Gun(unit, 'missle-red',0,0))
     }
 
-    for(var i = 0; i < 10; i++){
-      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(8000,8500),Phaser.Math.Between(-4000, 4000))
+    for(var i = 0; i < 6; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(6000,8500),Phaser.Math.Between(-4000, 4000))
+      this.gameManager.comp[0].formation.addUnit(unit)
       unit.addAttachment(new Gun(unit, 'missle-red',0,0))
     }
-
+    for(var i = 0; i < 6; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(6000,8500),Phaser.Math.Between(-4000, 4000))
+      this.gameManager.comp[0].formation.addUnit(unit)
+      unit.addAttachment(new Gun(unit, 'missle-red',0,0))
+    }for(var i = 0; i < 6; i++){
+      var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(6000,8500),Phaser.Math.Between(-4000, 4000))
+      this.gameManager.comp[0].formation.addUnit(unit)
+      unit.addAttachment(new Gun(unit, 'missle-red',0,0))
+    }
     this.gameManager.sort()
 
     for(var i = 0; i < this.gameManager.player.length; i++){
@@ -52,7 +72,6 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
 
   update(delta,time){
-    console.clear()
     this.gameManager.update()
   }
 

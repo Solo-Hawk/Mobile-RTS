@@ -41,7 +41,7 @@ class Gun extends Attachment{
     this.setRotation(this.host.rotation)
   }
   checkFire(){
-    if(this.loaded && this.host.state == 1 && this.host.mode = Game.Utils.statics.commands.ATTACK){
+    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
       // console.log("Can Shoot");
       var line = this.host.getPosition().subtract(this.host.getTarget().getPosition())
       if(
