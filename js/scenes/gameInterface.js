@@ -117,6 +117,7 @@ class GameInterface extends Phaser.Scene{
     this.createGameUI()
     this.createControlPanelUI()
     this.createFactoryUI()
+    this.closeControlPanel()
   }
 
   update(delta, time){
@@ -126,9 +127,13 @@ class GameInterface extends Phaser.Scene{
   setFocus(context){
     console.log(context);
     console.log(context.type);
-    switch (focus.type) {
+    switch (context.type) {
       case "unit":
-        this.openControlPanel(context.formation)
+        if(context.team != Game.Utils.statics.teams.PLAYER){
+          console.log("NOT PLAYER"); return
+        }
+        this.openControlPanel(this.getFormationData(context.formation))
+
         break;
 
     }
@@ -146,14 +151,36 @@ class GameInterface extends Phaser.Scene{
     this.ui.unitPanel.deselectButton.setInteractive().on("pointerdown", ()=>{
       this.closeControlPanel()
     })
+    this.ui.unitPanel.item1 = new RectLabelButton(this,""  , this.textStyles.main, 1, config.width/2 - 600, config.height - 200, 400, 60, 0x0000ff, 1)
+    this.ui.unitPanel.item2 = new RectLabelButton(this,""  , this.textStyles.main, 1, config.width/2 - 600, config.height - 120, 400, 60, 0x0000ff, 1)
+    this.ui.unitPanel.item3 = new RectLabelButton(this,""  , this.textStyles.main, 1, config.width/2 - 600, config.height - 40, 400, 60, 0x0000ff, 1)
   }
 
   openControlPanel(context){
     console.log("Open");
+    this.setControlPanelContext(context)
+    this.ui.unitPanel.panel.setVisible(true)
+    this.ui.unitPanel.deselectButton.setVisible(true)
+    this.ui.unitPanel.item1.setVisible(true)
+    this.ui.unitPanel.item2.setVisible(true)
+    this.ui.unitPanel.item3.setVisible(true)
   }
+  getFormationData(formation){
+    return ["Unit Count: ", formation.ships.length]
+  }
+  setControlPanelContext(context){
+    this.ui.unitPanel.item1.setText(context[0] + context[1])
+
+  }
+
 
   closeControlPanel(){
     console.log("Closing");
+    this.ui.unitPanel.panel.setVisible(false)
+    this.ui.unitPanel.deselectButton.setVisible(false)
+    this.ui.unitPanel.item1.setVisible(false)
+    this.ui.unitPanel.item2.setVisible(false)
+    this.ui.unitPanel.item3.setVisible(false)
   }
 
   createFactoryUI(){
@@ -396,6 +423,16 @@ class GameInterface extends Phaser.Scene{
   launchFormation(){
     console.log("launch");
     // TODO: Call gamemanager and create formation
+    var formation = this.gameScene.gameManager.create.formation(Game.Utils.statics.teams.PLAYER)
+    for(var i = 0; i < this.values.factory.fighters.light; i++){
+      var unit = this.gameScene.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-300, 300),Phaser.Math.Between(-300, 300))
+      formation.addUnit(unit)
+    }
+    for(var i = 0; i < this.values.factory.fighters.heavy; i++){
+      var unit = this.gameScene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-300, 300),Phaser.Math.Between(-300, 300))
+      formation.addUnit(unit)
+    }
+
     this.values.factory.fighters.light     = 0
     this.values.factory.fighters.heavy     = 0
     this.values.factory.frigates.swatter   = 0
@@ -414,6 +451,7 @@ class GameInterface extends Phaser.Scene{
       this.setFrigateMenu(false)
       this.setCruiserMenu(false)
     }
+
   }
 
   updateLabels(){

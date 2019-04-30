@@ -83,6 +83,9 @@ class Factory{
     y = y || 0;
     var s = new Fighter(this.scene, x, y, 'heavy-fighter-'+this.getColor(team), team)
     s.rating = 30
+    s.setScale(1.6)
+    s.maxLinearSpeed = 1200
+    s.maxLinearAcceleration = 50
     this.manager.ships.push(s)
     this.manager.sort()
     return s

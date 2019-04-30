@@ -1,15 +1,7 @@
-class Steerable extends Phaser.GameObjects.Sprite {
+class Steerable extends Interactable {
 
   constructor(scene, x, y, texture){
     super(scene, x, y, texture)
-
-    this.scene = scene
-    this.scene.add.existing(this)
-
-    this.setOrigin(0.5, 0.5)
-    this.scene.impact.add.existing(this)
-
-    this.body.collides = Phaser.Physics.Impact.COLLIDES.NEVER
 
     // this.moveMode = gametools.statics.steeringBehaviours.ARRIVAL;
 
@@ -173,7 +165,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     t = t / (this.maxLinearSpeed*3)
     // console.log(t);
     var futurePos = target.getPosition().add(target.linearVelocity.clone().scale(t))
-    this.seek(futurePos,200)
+    this.seek(futurePos,50)
 
     // console.log("Pursuit");
   }

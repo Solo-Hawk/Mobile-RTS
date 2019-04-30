@@ -13,14 +13,14 @@ class BaseShip extends Steerable{
     this.target = Game.Utils.statics.BLANK;
     this.mode = Game.Utils.statics.commands.IDLE
     this.ranges = {
-      attackRange : 1500,
-      evadeRange  : 800,
+      attackRange : 800,
+      evadeRange  : 300,
       returnRange : 4000,
       engageRange : 3000
     }
 
-    this.maxLinearSpeed = 3000
-    this.maxLinearAcceleration = 300
+    this.maxLinearSpeed = 2000
+    this.maxLinearAcceleration = 150
 
 
     this.state = 1
@@ -51,7 +51,7 @@ class BaseShip extends Steerable{
         case 1:
           // console.log("Pursuit to Target");
           this.pursuit(this.target);
-          if(this.distanceFrom(this.target) <= this.linearVelocity.length()){
+          if(this.distanceFrom(this.target) <= this.linearVelocity.length() * 3){
             this.state = 2;
           }
           break;

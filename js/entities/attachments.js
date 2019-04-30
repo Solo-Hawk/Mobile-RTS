@@ -25,7 +25,7 @@ class Attachment extends Phaser.GameObjects.Sprite{
 class Gun extends Attachment{
   constructor(host, texture, x, y){
     super(host, texture, x, y)
-    this.range = 500;
+    this.range = 800;
     this.damage = 10;
     this.maxAmmo = 3;
     this.ammo = this.maxAmmo;
@@ -41,18 +41,27 @@ class Gun extends Attachment{
     this.setRotation(this.host.rotation)
   }
   checkFire(){
+
     if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
       // console.log("Can Shoot");
-      var line = this.host.getPosition().subtract(this.host.getTarget().getPosition())
+      var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
+
+      var shortestAngle = Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(this.host.rotation), Phaser.Math.RadToDeg(line.toAngle()))
+      // console.log(line.length());
+      // console.log(line.length() <= this.range);
+      // console.log(Phaser.Math.RadToDeg(this.host.rotation));
+      // console.log(Phaser.Math.RadToDeg(line.toAngle()));
+      // console.log((this.host.rotation - 15) < shortestAngle &&  shortestAngle < (this.host.rotaiton + 15));
+      // console.log(shortestAngle);
       if(
-        line.length() <= this.range && line.toAngle() == this.host.rotation){
-        this.shoot(this.host.getTarget())
+        line.length() <= this.range && -15 < shortestAngle && shortestAngle < 15){
+        this.fire(this.host.getTarget())
       }
     }
   }
 
   fire(){
-
+    console.log("fire");
   }
 }
 class Turret extends Attachment{
