@@ -1,13 +1,22 @@
-class Steerable extends Interactable {
+class Steerable extends Phaser.GameObjects.Sprite {
 
   constructor(scene, x, y, texture){
     super(scene, x, y, texture)
+    
+    this.scene.add.existing(this)
+    this.setOrigin(0.5, 0.5)
 
+
+    this.scene.impact.add.existing(this)
+    this.body.collides = Phaser.Physics.Impact.COLLIDES.NEVER
     // this.moveMode = gametools.statics.steeringBehaviours.ARRIVAL;
+
+    this.body.offset.x = this.width/2
+    this.body.offset.y = this.height/2
 
     this.rotationLock = true;
 
-    this.body.pos = Game.Utils.vector2d(this.body.pos.x, this.body.pos.y)
+    this.body.pos = Game.Utils.vector2d(this.body.pos.x+(this.width/2), this.body.pos.y+(this.height/2))
     this.position = this.body.pos
     this.body.vel = Game.Utils.vector2d(0,0)
     this.linearVelocity = this.body.vel

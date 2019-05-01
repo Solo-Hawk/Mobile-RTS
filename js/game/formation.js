@@ -1,5 +1,6 @@
 class Formation{
-  constructor(team, ships){
+  constructor(manager, team, ships){
+    this.manager = manager;
     this.team = team || Game.Utils.statics.teams.NEUTRAL;
     this.type = "formation"
     this.ships = ships || []
@@ -12,8 +13,11 @@ class Formation{
     if(this.flagship == Game.Utils.statics.BLANK){
       this.findFlagship()
     }
-
+    if(this.objective.target.ships.length == 0){
+      this.objective == Game.Utils.statics.BLANK
+    }
     if(this.objective == Game.Utils.statics.BLANK){
+      this.manager.getNearestTarget(this)
       return
     }
     if(this.objective.command == Game.Utils.statics.BLANK || this.objective.command == Game.Utils.statics.commands.IDLE){
@@ -24,7 +28,7 @@ class Formation{
         break;
       case Game.Utils.statics.commands.ATTACK:
         this.ships.forEach((ship)=>{
-          if(!ship.target.alive || ship.target == Game.Utils.statics.BLANK){
+          if(ship.target == Game.Utils.statics.BLANK){
             ship.setTarget(this.objective.target.ships[Math.floor(Math.random() * this.objective.target.ships.length)])
           }
           ship.mode = Game.Utils.statics.commands.ATTACK

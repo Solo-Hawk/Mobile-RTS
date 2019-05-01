@@ -11,77 +11,45 @@ class SceneLevelDevelopment extends Phaser.Scene{
   }
   create(){
     console.log("CREATED HERE");
-    this.units = {
-      test:{
-      }
-    }
 
-    // var formation;
-    // for(var i = 0; i < 3; i++){
-    //   var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -6000),Phaser.Math.Between(-4000, 4000))
-    //   if(i == 0){
-    //     formation = unit.formation
-    //   }
-    //   formation.addUnit(unit)
-    //   unit.addAttachment(new Gun(unit, 'missle-red',0,0))
-    // }
-    // for(var i = 0; i < 10; i++){
-    //   var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -6000),Phaser.Math.Between(-4000, 4000))
-    //   if(i == 0){
-    //     formation = unit.formation
-    //   }
-    //   formation.addUnit(unit)
-    //   unit.addAttachment(new Gun(unit, 'missle-red',0,0))
-    // }
-    // for(var i = 0; i < 5; i++){
-    //   var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-8500, -6000),Phaser.Math.Between(-4000, 4000))
-    //   if(i == 0){
-    //     formation = unit.formation
-    //   }
-    //   formation.addUnit(unit)
-    //   unit.addAttachment(new Gun(unit, 'missle-red',0,0))
-    // }
-    //
-    // for(var i = 0; i < 7; i++){
-    //   var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(6000,8500),Phaser.Math.Between(-4000, 4000))
-    //   if(i == 0){
-    //     formation = unit.formation
-    //   }
-    //   formation.addUnit(unit)
-    //   unit.addAttachment(new Gun(unit, 'missle-red',0,0))
-    // }
-    // for(var i = 0; i < 6; i++){
-    //   var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(6000,8500),Phaser.Math.Between(-4000, 4000))
-    //   if(i == 0){
-    //     formation = unit.formation
-    //   }
-    //   formation.addUnit(unit)
-    //   unit.addAttachment(new Gun(unit, 'missle-red',0,0))
-    // }for(var i = 0; i < 5; i++){
-    //   var unit = this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER, Phaser.Math.Between(6000,8500),Phaser.Math.Between(-4000, 4000))
-    //   if(i == 0){
-    //     formation = unit.formation
-    //   }
-    //   formation.addUnit(unit)
-    //   unit.addAttachment(new Gun(unit, 'missle-red',0,0))
-    // }
-    // this.gameManager.sort()
-    //
-    // for(var i = 0; i < this.gameManager.player.length; i++){
-    //   this.gameManager.player[i].formation.setObjective(this.gameManager.comp[Phaser.Math.Between(0,this.gameManager.comp.length-1)])
-    // }
-    // for(var i = 0; i < this.gameManager.comp.length; i++){
-    //   this.gameManager.comp[i].formation.setObjective(this.gameManager.player[Phaser.Math.Between(0,this.gameManager.player.length-1)])
-    // }
+
     var camera = this.cameras.getCamera("");
 
-    camera.setZoom(0.24)
+    camera.setZoom(0.36)
+    var formation1 = this.gameManager.create.formation(Game.Utils.statics.teams.PLAYER)
+    var formation2 = this.gameManager.create.formation(Game.Utils.statics.teams.COMPUTER)
+    var formation3 = this.gameManager.create.formation(Game.Utils.statics.teams.PLAYER)
+    var formation4 = this.gameManager.create.formation(Game.Utils.statics.teams.COMPUTER)
+
+    this.gameManager.create.playerBaseNode(-5000,500)
+    this.gameManager.create.computerBaseNode(8000,500)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation1)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation1)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation1)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation1)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation1)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation2)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation2)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation3)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation3)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation3)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation4)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation4)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation3)
+    this.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation3)
+    formation1.findFlagship()
+    formation2.findFlagship()
+    formation3.findFlagship()
+    formation4.findFlagship()
+
   }
 
 
   update(delta,time){
-    // console.clear();
+    console.clear();
     this.gameManager.update()
+    console.log(this.gameManager.formations.length);
+
   }
 
 

@@ -2,8 +2,16 @@ class GameManager {
   constructor(scene) {
     this.scene = scene
     this.ships = []
-    this.player = []
-    this.comp = []
+    this.player = {
+      base: null,
+      ships:[],
+      formations:[]
+    }
+    this.comp = {
+      base: null,
+      ships:[],
+      formations:[]
+    }
     this.formations = []
     this.emitters = []
     this.projectiles = []
@@ -38,12 +46,28 @@ class GameManager {
       switch (ship.team) {
         case Game.Utils.statics.teams.PLAYER:
           if(this.player.indexOf(ship) == -1){
-            this.player.push(ship)
+            this.player.ships.push(ship)
           }
           break;
         case Game.Utils.statics.teams.COMPUTER:
           if(this.comp.indexOf(ship) == -1){
-            this.comp.push(ship)
+            this.comp.ships.push(ship)
+          }
+          break;
+
+
+      }
+    }, this)
+    this.formations.forEach((ship)=>{
+      switch (ship.team) {
+        case Game.Utils.statics.teams.PLAYER:
+          if(this.player.indexOf(ship) == -1){
+            this.player.formations.push(ship)
+          }
+          break;
+        case Game.Utils.statics.teams.COMPUTER:
+          if(this.comp.indexOf(ship) == -1){
+            this.comp.formations.push(ship)
           }
           break;
 
@@ -62,9 +86,12 @@ class Factory{
   formation(team, ships){
     team = team || Game.Utils.statics.teams.NEUTRAL
     ships = ships || []
-    var f = new Formation(team, ships)
+    var f = new Formation(this.manager, team, ships)
     this.manager.formations.push(f)
     return f
+  }
+  base(){
+
   }
   lightFighter(team,x,y){
     if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}

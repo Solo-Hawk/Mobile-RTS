@@ -15,8 +15,8 @@ class Attachment extends Phaser.GameObjects.Sprite{
   update(){
     var pos = this.host.getPosition()
     this.setPosition(
-      pos.x + this.host.displayOriginX + (this.px * Math.cos(this.host.rotation) - this.py * Math.sin(this.host.rotation)),
-      pos.y + this.host.displayOriginY + (this.px * Math.sin(this.host.rotation) + this.py * Math.cos(this.host.rotation))
+      pos.x +(this.px * Math.cos(this.host.rotation) - this.py * Math.sin(this.host.rotation)),
+      pos.y +(this.px * Math.sin(this.host.rotation) + this.py * Math.cos(this.host.rotation))
     )
 
   }

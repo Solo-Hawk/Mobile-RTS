@@ -9,7 +9,6 @@ class BaseShip extends Steerable{
     this.team = team || Game.Utils.statics.teams.NEUTRAL;
     this.attachments = [];
     this.formation = scene.gameManager.create.formation(this.team, [this])
-    this.formationDisplacement =
     this.target = Game.Utils.statics.BLANK;
     this.mode = Game.Utils.statics.commands.IDLE
     this.ranges = {
@@ -26,6 +25,8 @@ class BaseShip extends Steerable{
     this.state = 1
   }
   setTarget(target){
+    console.log("Got Target");
+    console.log(target.type);
     this.target = target || Game.Utils.statics.BLANK
   }
   getTarget(){
