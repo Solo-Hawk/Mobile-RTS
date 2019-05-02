@@ -1,7 +1,7 @@
 class BaseShip extends Steerable{
   constructor(scene, x, y, texture, team){
     super(scene, x, y, texture)
-    console.log(x,y);
+    // console.log(x,y);
     this.type = "unit"
     this.rating = 1;
     this.health = 100;
@@ -11,22 +11,26 @@ class BaseShip extends Steerable{
     this.formation = scene.gameManager.create.formation(this.team, [this])
     this.target = Game.Utils.statics.BLANK;
     this.mode = Game.Utils.statics.commands.IDLE
-    this.ranges = {
-      attackRange : 800,
-      evadeRange  : 300,
-      returnRange : 4000,
-      engageRange : 3000
-    }
 
-    this.maxLinearSpeed = 2000
-    this.maxLinearAcceleration = 150
+    this.maxLinearSpeed = 3000
+    this.maxLinearAcceleration = 600
 
-
+    this.longest = this.width > this.height ? this.width : this.height
+    this.shortest = this.width < this.height ? this.width : this.height
     this.state = 1
   }
+  setScale(s){
+    super.setScale(s)
+
+    this.body.offset.x = (this.width * s)/2
+    this.body.offset.y = (this.height * s)/2
+    this.longest = this.width > this.height ? this.width : this.height
+    this.shortest = this.width < this.height ? this.width : this.height
+  }
   setTarget(target){
-    console.log("Got Target");
-    console.log(target.type);
+    if(!target)return
+    // console.log("Got Target",target);
+    // console.log(target.type);
     this.target = target || Game.Utils.statics.BLANK
   }
   getTarget(){
@@ -34,64 +38,14 @@ class BaseShip extends Steerable{
     }
 
   update(target){
-    this.target = target || this.target
-    if(this.target == Game.Utils.statics.BLANK){
-      // console.log("no target");
-      return
-    }
-    if(this.mode == Game.Utils.statics.commands.IDLE){
-      this.idle()
-    }
-    if(this.mode == Game.Utils.statics.commands.MOVE){
-      console.log("Move Mo");
-      this.seek(this.target.getPosition())
-    }
-    if(this.mode == Game.Utils.statics.commands.ATTACK){
-      // console.log(this.state);
-      switch (this.state) {
-        case 1:
-          // console.log("Pursuit to Target");
-          this.pursuit(this.target);
-          if(this.distanceFrom(this.target) <= this.linearVelocity.length() * 3){
-            this.state = 2;
-          }
-          break;
-        case 2:
-          // console.log("Evade to Target");
-          this.evade(this.target)
-          this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
-          if(this.distanceFrom(this.target) >= this.ranges.returnRange){
-            this.state = 3
-          }else if(this.formation.flagship != this){
-            if(this.distanceFrom(this.formation.flagship) <= this.ranges.returnRange / 4){
-              this.state = 4
-            }
-          }
-
-          break;
-        case 3:
-          // console.log("Seeking to Target");
-          this.seek(this.target.getPosition(),100)
-          if(this.distanceFrom(this.target) <= this.ranges.attackRange){
-            this.state = 1
-          }
-          break;
-        case 4:
-          // // console.log("Returning to FS", this.formation.flagship.getPosition());
-          this.seek(this.formation.flagship.getPosition(),0)
-          if(this.distanceFrom(this.formation.flagship) <= 800){
-            this.state = 3
-          }
-          this.state = 3
-          break;
-
-      }
-
-    }
-
 
     super.update()
     this.updateAttachments()
+  }
+  checkAttachments(){
+    this.attachments.forEach((a)=>{
+      a.update()
+    })
   }
   updateAttachments(){
     this.attachments.forEach((a)=>{
@@ -105,14 +59,183 @@ class BaseShip extends Steerable{
   addAttachment(a){
     this.attachments.push(a)
   }
+  damage(d){
+    this.health -= d
+    if(this.health <= 0){
+      this.alive = false
+    }
+  }
+  disconnect(){
+    this.attachments.forEach((a)=>{
+      a.host = 0
+      a.destroy()
+    })
+  }
+  getNearestTarget(){
+    var closestUnit;
+    var closestDistance;
+    this.formation.target.ships.forEach((ship)=>{
+      var distance = this.distanceFrom(ship)
+      if(closestDistance){
+          if(distance < closestDistance){
+            closestUnit = ship
+            closestDistance = distance
+          }
+        }else{
+          // console.log("Force Setting Formation");
+          closestUnit = ship
+          closestDistance  = distance
+        }
+    },this)
+    return closestUnit
+  }
 }
 
 class Fighter extends BaseShip{
   constructor(scene, x, y, texture, team){
-
-    console.log(x,y);
     super(scene, x, y, texture, team)
+    this.ranges = {
+      attackRange : 1400,
+      evadeRange  : 1000,
+      returnRange : 3000,
+      engageRange : 7000
+    }
+
+  }
+  update(target){
+    if(!this.target.alive)return
+    if(!this.alive){
+      this.idle()
+      super.update()
+      return
+    }
+
+    this.target = target || this.target
+
+      /*
+      1- Attacking
+      2- Evading Target
+      3-
+      4-
+      */
+      switch (this.state) {
+        case 1:
+          this.seek(this.target.getPosition(),this.maxLinearAcceleration,30)
+          if(this.distanceFrom(this.target) >= this.ranges.engageRange && this.formation.flagship != this){
+            this.state = 4
+          }else if(this.distanceFrom(this.target) <= this.ranges.evadeRange + this.target.longest){
+            this.state = 2
+          }
+          break;
+        case 2:
+          this.evade(this.target)
+          // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
+          // if(this.distanceFrom(this.target) <= this.ranges.engageRange + this.target.longest){
+          //   this.target = this.getNearestTarget() || this.target
+          //   this.state = 1
+          // }
+          if(this.distanceFrom(this.target) >= this.ranges.returnRange){
+            this.state = 3
+          }else if(this.distanceFrom(this.target) >= this.ranges.engageRange && this.formation.flagship != this){
+            this.state = 4
+          }
+
+          break;
+        case 3:
+          this.pursuit(this.target, 300);
+          // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
+          if(this.distanceFrom(this.target) <= this.ranges.attackRange){
+            this.target = this.getNearestTarget() || this.target
+            this.state = 1
+          }
+          break;
+        case 4:
+          this.seek(this.formation.getFormationPosition(this),8,8)
+          // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
+          if(this.distanceFrom(this.target) <= this.ranges.engageRange){
+            this.state = 3
+          }
+          break;
+
+      }
 
 
+
+
+    super.update()
+  }
+}
+
+class Frigate extends BaseShip{
+  constructor(scene, x, y, texture, team){
+
+    // console.log(x,y);
+    super(scene, x, y, texture, team)
+    this.ranges = {
+      maintainRange:4000,
+      engageRange: 6000
+    }
+    this.setDepth(3)
+
+  }
+  update(target){
+    // if(!this.alive)console.log("Waiting to die");
+
+    // if(!this.target.alive)console.log("TARGET IS DEAD");
+    // if(!this.target.alive)console.log(this.target);
+    if(!this.target.alive)return
+    if(!this.alive){
+      this.idle()
+      super.update()
+      return
+    }
+
+    this.target = target || this.target
+    if(this.target == Game.Utils.statics.BLANK){
+      // console.log("no target");
+      return
+    }
+      // console.log(this.state);
+      /*
+      1- Attacking
+      2- Evading Target
+      3-
+      4-
+      */
+      // console.log(this.state, this.formation.flagship == this);
+      // console.log(this.state);
+      switch (this.state) {
+        case 1:
+          this.seek(this.target.getPosition(),this.ranges.maintainRange,10)
+          if(this.distanceFrom(this.target) >= this.ranges.engageRange && this.formation.flagship != this){
+            this.state = 4
+          }
+          break;
+        case 2:
+          this.evade(this.target)
+          this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
+          if(this.distanceFrom(this.target) <= this.ranges.engageRange + this.target.longest){
+            this.target = this.getNearestTarget() || this.target
+            this.state = 1
+          }if(this.distanceFrom(this.target) >= this.ranges.engageRange && this.formation.flagship != this){
+            this.state = 4
+          }
+
+          break;
+        case 4:
+          this.seek(this.formation.getFormationPosition(this),8,8)
+          // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
+          if(this.distanceFrom(this.target) <= this.ranges.engageRange){
+            this.target = this.getNearestTarget() || this.target
+            this.state = 1
+          }
+          break;
+
+      }
+
+
+
+
+    super.update()
   }
 }

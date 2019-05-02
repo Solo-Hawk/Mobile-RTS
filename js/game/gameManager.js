@@ -18,14 +18,14 @@ class GameManager {
     this.create = new Factory(this.scene, this)
   }
   update(){
-    console.log(this.formations);
-    console.log(this.player.formations);
-    console.log(this.comp.formations);
+    // console.log(this.formations);
+    // console.log(this.player.formations);
+    // console.log(this.comp.formations);
 
     this.player.formations.forEach((formation)=>{
         formation.update()
-        console.log(formation.ships.length);
-        console.log(formation.ships.length == 0);
+        // console.log(formation.ships.length);
+        // console.log(formation.ships.length == 0);
         if(formation.ships.length == 0){
           this.player.formations = Game.Utils.arrayRemove(this.player.formations, formation)
           this.formations = Game.Utils.arrayRemove(this.formations, formation)
@@ -39,19 +39,37 @@ class GameManager {
       }
     },this)
 
-    console.log(this.formations);
-    console.log(this.player.formations);
-    console.log(this.comp.formations);
+    // console.log(this.formations);
+    // console.log(this.player.formations);
+    // console.log(this.comp.formations);
 
     this.ships.forEach((ship)=>{
       ship.update()
+      if(!ship.alive){
+        ship.disconnect()
+        this.ships = Game.Utils.arrayRemove(this.ships, ship)
+
+        if(ship.team == Game.Utils.statics.teams.PLAYER){
+          this.player.ships = Game.Utils.arrayRemove(this.player.ships, ship)
+        }else if(ship.team == Game.Utils.statics.teams.COMPUTER){
+          this.comp.ships = Game.Utils.arrayRemove(this.comp.ships, ship)
+        }
+        ship.destroy()
+
+      }
     })
     this.projectiles.forEach((projectile)=>{
+      if(!projectile.alive){
+        projectile.destroy()
+        this.projectiles = Game.Utils.arrayRemove(this.projectiles, projectile)
+      }
       projectile.update()
     })
     if(this.ships.length > (this.player.length + this.comp.length)){
       this.sort()
     }
+    this.player.base.update()
+    this.comp.base.update()
   }
   sort(){
     this.ships.forEach((ship)=>{
@@ -90,29 +108,29 @@ class GameManager {
   getNearestTarget(formation){
     if(formation.ships.length == 0)return
     if(formation.flagship == Game.Utils.statics.BLANK)formation.findFlagship()
-    console.log(formation);
+    // console.log(formation);
     var formationList = formation.team == Game.Utils.statics.teams.PLAYER ? this.getComputerFormations() : this.getPlayerFormations()
     if(formationList[0] == this.comp.base || formationList[0] == this.player.formations)return formationList[0];
-    console.log(formationList);
+    // console.log(formationList);
     var fs = formation.flagship
-    console.log(fs);
+    // console.log(fs);
     var closestFormation;
     var closestDistance;
     formationList.forEach((formation)=>{
       if(formation.flagship != Game.Utils.statics.BLANK){
-        console.log(formation);
-        console.log(fs);
+        // console.log(formation);
+        // console.log(fs);
         var distance = fs.distanceFrom(formation.flagship)
-        console.log(distance);
-        console.log(closestDistance);
-        console.log(distance < closestDistance);
+        // console.log(distance);
+        // console.log(closestDistance);
+        // console.log(distance < closestDistance);
         if(closestDistance){
           if(distance < closestDistance){
             closestFormation = formation
             closestDistance = distance
           }
         }else{
-          console.log("Force Setting Formation");
+          // console.log("Force Setting Formation");
           closestFormation = formation
           closestDistance   = distance
         }
@@ -121,6 +139,7 @@ class GameManager {
     return closestFormation
 
   }
+
   getComputerFormations(){
     return this.comp.formations
   }
@@ -147,6 +166,15 @@ class Factory{
     var spawnPos = this.getSpawn(team)
     var s = new Fighter(this.scene, spawnPos.x, spawnPos.y, 'light-fighter-'+this.getColor(team), team)
     s.rating = 10
+    s.health = 80 * 10
+    s.maxLinearSpeed = 6000
+    s.maxLinearAcceleration = 400
+    s.ranges = {
+      attackRange : 3000,
+      evadeRange  : 1000,
+      returnRange : 3000,
+      engageRange : 7000
+    }
     s.addAttachment(new Gun(s,'missle-red',0,0))
     if(formation){
       formation.addUnit(s)
@@ -155,6 +183,154 @@ class Factory{
     this.manager.sort()
     return s
   }
+  heavyFighter(team, formation){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    var spawnPos = this.getSpawn(team)
+    var s = new Fighter(this.scene, spawnPos.x, spawnPos.y, 'heavy-fighter-'+this.getColor(team), team)
+    s.rating = 30
+    s.health = 260 * 10
+    s.maxLinearSpeed = 4800
+    s.maxLinearAcceleration = 350
+    s.ranges = {
+      attackRange : 4000,
+      evadeRange  : 1400,
+      returnRange : 3000,
+      engageRange : 7000
+    }
+    s.setScale(2)
+    s.addAttachment(new MissleLauncher(s,'missle-red',0,0,150,2,3000,8000, 140, 700,80,1.4))
+    if(formation){
+      formation.addUnit(s)
+    }
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+  swatterFrigate(team, formation){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    var spawnPos = this.getSpawn(team)
+    var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'swatter-frigate-'+this.getColor(team), team)
+    s.rating = 140
+    s.health = 600 * 10
+    s.maxLinearSpeed = 3000
+    s.maxLinearAcceleration = 20
+    s.ranges = {
+      maintainRange:4000,
+      engageRange: 6000
+    }
+    s.setScale(3.5)
+    s.addAttachment(new Turret(s,'turret-01',0,70).setScale(1))
+    s.addAttachment(new Turret(s,'turret-01',0,-70).setScale(1))
+    if(formation){
+      formation.addUnit(s)
+    }
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+  bastionFrigate(team, formation){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    var spawnPos = this.getSpawn(team)
+    var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'bastion-frigate-'+this.getColor(team), team)
+    s.rating = 300
+    s.health = 1800 * 10
+    s.maxLinearSpeed = 2200
+    s.maxLinearAcceleration = 12
+    s.ranges = {
+      maintainRange:7000,
+      engageRange: 9000
+    }
+    s.setScale(2)
+    s.addAttachment(new HeavyTurret(s,'turret-01',300).setScale(3))
+    s.addAttachment(new HeavyTurret(s,'turret-01',-300).setScale(3))
+    s.addAttachment(new SmartMissleLauncher(s,'missle-red',0,0,50,6,10000,16000, 300, 1400,120,3))
+    if(formation){
+      formation.addUnit(s)
+    }
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+  slammerFrigate(team, formation){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    var spawnPos = this.getSpawn(team)
+    var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'slammer-frigate-'+this.getColor(team), team)
+    s.rating = 350
+    s.health = 1800 * 10
+    s.maxLinearSpeed = 2200
+    s.maxLinearAcceleration = 12
+    s.ranges = {
+      maintainRange:7000,
+      engageRange: 9000
+    }
+    s.setScale(2)
+
+    s.addAttachment(new Turret(s,'turret-01',300,0).setScale(2))
+    s.addAttachment(new SuperTurret(s,'turret-01',-250,200).setScale(5))
+    s.addAttachment(new SuperTurret(s,'turret-01',-250,-200).setScale(5))
+    // s.addAttachment(new SmartMissleLauncher(s,'missle-red',0,0,50,30,10000,16000, 300, 1400,400,3))
+    if(formation){
+      formation.addUnit(s)
+    }
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+  leviathanCruiser(team, formation){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    var spawnPos = this.getSpawn(team)
+    var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'leviathan-cruiser-'+this.getColor(team), team)
+    s.rating = 600
+    s.health = 6500 * 10
+    s.maxLinearSpeed = 2200
+    s.maxLinearAcceleration = 12
+    s.ranges = {
+      maintainRange:7000,
+      engageRange: 9000
+    }
+    s.setScale(6)
+
+    s.addAttachment(new Turret(s,'turret-01',100,200).setScale(2))
+    s.addAttachment(new Turret(s,'turret-01',-300,200).setScale(2))
+    s.addAttachment(new Turret(s,'turret-01',100,-200).setScale(2))
+    s.addAttachment(new Turret(s,'turret-01',-300,-200).setScale(2))
+    s.addAttachment(new SmartMissleLauncherV2(s,'missle-red',0,0,10,10,3000,21000, 20, 2000,5,3))
+    // s.addAttachment(new SmartMissleLauncher(s,'missle-red',0,0,50,30,10000,16000, 300, 1400,400,3))
+    if(formation){
+      formation.addUnit(s)
+    }
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+  hunterCruiser(team, formation){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    var spawnPos = this.getSpawn(team)
+    var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'hunter-cruiser-'+this.getColor(team), team)
+    s.rating = 900
+    s.health = 4000 * 10
+    s.maxLinearSpeed = 2200
+    s.maxLinearAcceleration = 12
+    s.ranges = {
+      maintainRange:14000,
+      engageRange: 15000
+    }
+    s.setScale(6)
+
+    s.addAttachment(new MegaGun(s,'turret-01',-250,0).setScale(10))
+    // s.addAttachment(new SmartMissleLauncher(s,'missle-red',0,0,50,30,10000,16000, 300, 1400,400,3))
+    if(formation){
+      formation.addUnit(s)
+    }
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+
+
+
+
+
   playerBaseNode(x ,y){
     this.manager.player.base = new BaseNode(this.scene,x,y,'home-base-'+this.getColor(Game.Utils.statics.teams.PLAYER), Game.Utils.statics.teams.PLAYER, 600, 0)
   }

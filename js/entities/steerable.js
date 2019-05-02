@@ -2,17 +2,21 @@ class Steerable extends Phaser.GameObjects.Sprite {
 
   constructor(scene, x, y, texture){
     super(scene, x, y, texture)
-    
+
+    this.scene = scene
+
     this.scene.add.existing(this)
     this.setOrigin(0.5, 0.5)
 
 
     this.scene.impact.add.existing(this)
-    this.body.collides = Phaser.Physics.Impact.COLLIDES.NEVER
+    this.body.collides = Phaser.Physics.Impact.COLLIDES.LITE
     // this.moveMode = gametools.statics.steeringBehaviours.ARRIVAL;
 
     this.body.offset.x = this.width/2
     this.body.offset.y = this.height/2
+
+
 
     this.rotationLock = true;
 
@@ -24,8 +28,8 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.steering = Game.Utils.vector2d(0,0)
     this.orientation = this.body.angle //In Radians
 
-    this.maxLinearSpeed         = 6000;
-    this.maxLinearAcceleration  = 1200;
+    this.maxLinearSpeed         = 10000;
+    this.maxLinearAcceleration  = 5000;
     this.maxAngularSpeed        = 12;
     this.maxAngularAcceleration = 7;
 
@@ -124,6 +128,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.setLinearVelocity(force)
   }
   seek(target, radius, brace){
+    brace = brace || 0
     // console.log("seek");
     this.desiredVelocity = target.subtract(this.getPosition())
     var distance = this.desiredVelocity.length()
@@ -137,7 +142,6 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.appliableForces.push(force)
 
   }
-
 
   flee(target){
     // console.log("flee");
@@ -167,14 +171,14 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.appliableForces.push(force)
     // console.log("Wander");
   }
-  pursuit(target){
+  pursuit(target, radius){
     // console.log("pursuit");
     var t = target.getPosition().subtract(this.getPosition()).length()
     // console.log(s, target.linearVelocity.length());
-    t = t / (this.maxLinearSpeed*3)
+    t = t / 10000
     // console.log(t);
-    var futurePos = target.getPosition().add(target.linearVelocity.clone().scale(t))
-    this.seek(futurePos,50)
+    var futurePos = target.getPosition().add(target.linearVelocity.clone().scale(0.8))
+    this.seek(futurePos,radius,100)
 
     // console.log("Pursuit");
   }
@@ -182,7 +186,12 @@ class Steerable extends Phaser.GameObjects.Sprite {
     // console.log("evade");
     var distance = target.getPosition().subtract(this.getPosition()).length()
     var ahead = distance / this.maxLinearSpeed;
-    this.flee(target.getPosition().add(target.linearVelocity.clone().scale(ahead)).scale(this.maxLinearAcceleration))
+    if(target.linearVelocity.x == 0 && target.linearVelocity.y == 0){
+      // console.log("STATIC UNIT");
+      this.flee(target.getPosition())
+    }else{
+      this.flee(target.getPosition().add(target.linearVelocity.clone().scale(ahead)).scale(this.maxLinearAcceleration))
+    }
 
     // console.log("Evade");
   }

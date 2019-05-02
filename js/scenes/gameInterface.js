@@ -125,12 +125,13 @@ class GameInterface extends Phaser.Scene{
   }
 
   setFocus(context){
-    console.log(context);
-    console.log(context.type);
+    // console.log(context);
+    // console.log(context.type);
     switch (context.type) {
       case "unit":
         if(context.team != Game.Utils.statics.teams.PLAYER){
-          console.log("NOT PLAYER"); return
+          // console.log("NOT PLAYER");
+          return
         }
         this.openControlPanel(this.getFormationData(context.formation))
 
@@ -157,7 +158,7 @@ class GameInterface extends Phaser.Scene{
   }
 
   openControlPanel(context){
-    console.log("Open");
+    // console.log("Open");
     this.setControlPanelContext(context)
     this.ui.unitPanel.panel.setVisible(true)
     this.ui.unitPanel.deselectButton.setVisible(true)
@@ -175,7 +176,7 @@ class GameInterface extends Phaser.Scene{
 
 
   closeControlPanel(){
-    console.log("Closing");
+    // console.log("Closing");
     this.ui.unitPanel.panel.setVisible(false)
     this.ui.unitPanel.deselectButton.setVisible(false)
     this.ui.unitPanel.item1.setVisible(false)
@@ -187,7 +188,7 @@ class GameInterface extends Phaser.Scene{
     this.ui.factory = {}
     //Factory UI Button System
     var x = 10;
-    console.log(this);
+    // console.log(this);
     var y = config.height - 10;
 
 
@@ -421,7 +422,7 @@ class GameInterface extends Phaser.Scene{
   }
 
   launchFormation(){
-    console.log("launch");
+    // console.log("launch");
     // TODO: Call gamemanager and create formation
     var formation = this.gameScene.gameManager.create.formation(Game.Utils.statics.teams.PLAYER)
     for(var i = 0; i < this.values.factory.fighters.light; i++){
@@ -456,8 +457,8 @@ class GameInterface extends Phaser.Scene{
 
   updateLabels(){
     // This is hardcoded for simplicity, I wrote most of this in mind with multicursor so the time it took is minimal compared to making it flexible code
-    console.log(this.ui.factory.factoryButton);
-    console.log(this.values.factory.rating);
+    // console.log(this.ui.factory.factoryButton);
+    // console.log(this.values.factory.rating);
     this.ui.factory.lightFighterLabel      .setText(this.values.factory.fighters.light)
     this.ui.factory.heavyFighterLabel      .setText(this.values.factory.fighters.heavy)
     this.ui.factory.swatterFrigateLabel    .setText(this.values.factory.frigates.swatter)
@@ -547,7 +548,7 @@ class GameInterface extends Phaser.Scene{
 
 class RectLabelButton extends Phaser.GameObjects.Text{
   constructor(scene,text,textStyle,textalpha,x,y,width,height,fillColor,fillAlpha){
-    console.log("Adding Button");
+    // console.log("Adding Button");
     super(scene,x,y,text,textStyle)
 
     this.scene = scene
@@ -578,7 +579,7 @@ class RectLabelButton extends Phaser.GameObjects.Text{
 
 class CircleLabelButton extends Phaser.GameObjects.Text{
   constructor(scene,text,textStyle,textalpha,x,y,radius,fillColor,fillAlpha){
-    console.log("Adding Button");
+    // console.log("Adding Button");
     super(scene,x,y,text,textStyle)
 
     this.scene = scene

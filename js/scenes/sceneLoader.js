@@ -3,10 +3,21 @@ var resources = [
   ['heavy-fighter-blue', 'assets/ships/blue/enemyBlue4.png'],
   ['light-fighter-red' , 'assets/ships/red/enemyRed3.png'],
   ['light-fighter-blue', 'assets/ships/blue/enemyBlue3.png'],
+  ['swatter-frigate-red', 'assets/ships/red/enemyRed1.png'],
+  ['swatter-frigate-blue', 'assets/ships/blue/enemyBlue1.png'],
+  ['bastion-frigate-red', 'assets/ships/red/enemyRed6.png'],
+  ['bastion-frigate-blue', 'assets/ships/blue/enemyBlue6.png'],
+  ['slammer-frigate-red', 'assets/ships/red/enemyRed7.png'],
+  ['slammer-frigate-blue', 'assets/ships/blue/enemyBlue7.png'],
+  ['leviathan-cruiser-red', 'assets/ships/red/ship_red_levithan.png'],
+  ['leviathan-cruiser-blue', 'assets/ships/blue/ship_blue_levithan.png'],
+  ['hunter-cruiser-red', 'assets/ships/red/ship_red_hunter.png'],
+  ['hunter-cruiser-blue', 'assets/ships/blue/ship_blue_hunter.png'],
   ['home-base-red'     , 'assets/buildings/home_blue.png'],
   ['home-base-blue'    , 'assets/buildings/home_red.png'],
   ['missle-red', 'assets/missles/spaceMissiles_009.png'],
-  ['missle-blue', 'assets/missles/spaceMissiles_010.png']
+  ['missle-blue', 'assets/missles/spaceMissiles_010.png'],
+  ['turret-01', 'assets/turret/turret01.png']
 ]
 class SceneLoader extends Phaser.Scene{
   constructor(){
