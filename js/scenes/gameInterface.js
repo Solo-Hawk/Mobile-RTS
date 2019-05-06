@@ -161,9 +161,9 @@ class GameInterface extends Phaser.Scene{
   }
   createGameUI(){
     this.ui.game = {}
-    this.ui.game.constructionUnitsLabel = new RectLabelButton(this,"0 CU"         , this.textStyles.sub, 1, 125 , 70 , 240, 40, 0x007777, 1)
-    this.ui.game.playerHealth = new RectLabelButton(this,"Your Health: 100%"         , this.textStyles.sub, 1, 125 , 40 , 240, 40, 0x007777, 1)
-    this.ui.game.computerHealth = new RectLabelButton(this,"Enemy Health: 100%"         , this.textStyles.sub, 1, 2160 , 40 , 240, 40, 0x007777, 1)
+    this.ui.game.constructionUnitsLabel = new RectLabelButton(this,"0 CU"         , this.textStyles.sub, 1, 185 , 70 , 240, 40, 0x007777, 1)
+    this.ui.game.playerHealth = new RectLabelButton(this,"Your Health: 100%"         , this.textStyles.sub, 1, 185 , 40 , 240, 40, 0x007777, 1)
+    this.ui.game.computerHealth = new RectLabelButton(this,"Enemy Health: 100%"         , this.textStyles.sub, 1, 2100 , 40 , 240, 40, 0x007777, 1)
   }
   createControlPanelUI(){
     this.ui.unitPanel = {}
