@@ -193,10 +193,11 @@ class GameInterface extends Phaser.Scene{
     this.timeouts.forEach((t)=>{
       clearTimeout(t)
     })
+
+      window.open("https://forms.gle/XBbvYKKhPxugquQp8")
     button.setInteractive()
       .on('pointerdown', () => {setTimeout((scene)=>{
 
-        window.open("https://forms.gle/Ga1yNXqAiy1HVKRD6")
         scene.stop("level-development");
         scene.start("mainmenu");
         scene.switch("mainmenu");

@@ -480,7 +480,7 @@ class Factory{
     var s = new Fighter(this.scene, spawnPos.x, spawnPos.y, 'light-fighter-'+this.getColor(team), team)
     s.rating = 10
     s.health = 80
-    s.maxLinearSpeed = 20000
+    s.maxLinearSpeed = 6000
     s.maxLinearAcceleration = 400
     s.ranges = {
       attackRange : 3000,
