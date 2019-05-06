@@ -22,7 +22,7 @@ class BaseNode extends Steerable{
     this.width = this.width * 5
     this.height = this.height * 5
 
-    this.maxHealth = 1
+    this.maxHealth = 100000
     this.health = this.maxHealth
   }
   update(){
