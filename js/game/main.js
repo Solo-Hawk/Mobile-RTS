@@ -16,7 +16,7 @@ var config = {
     min: 15,
     target: 30,
   },
-  scene: [SceneLoader, SceneMenu, SceneLevelDevelopment],
+  scene: [SceneLoader, SceneMenu, SceneTutorial, SceneLevelDevelopment],
   scale:{
     mode:Phaser.Scale.FIT
   }

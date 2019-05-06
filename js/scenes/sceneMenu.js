@@ -15,7 +15,7 @@
     var loadingText = this.make.text({
         x: this.width / 2,
         y: this.height / 2 - 100,
-        text: 'Mobile - RTS',
+        text: 'Space RTS',
         style: {
             font: '32px monospace',
             fill: '#ffffff'
@@ -52,14 +52,17 @@
       .setInteractive({useHandCursor:true})
       .on('pointerover', () => {this.buttons.newGame.body.setFillStyle(0x3700B3);})
       .on('pointerout', () => {this.buttons.newGame.body.setFillStyle(0x6200EE);} )
-      .on('pointerdown', () => {/*this.scale.startFullscreen();*/this.scale.scaleMode = Phaser.Scale.FIT;this.scene.switch("level-development");} )
+      .on('pointerdown', () => {
+        this.scale.startFullscreen();
+        this.scale.scaleMode = Phaser.Scale.FIT;
+        this.scene.switch("level-development");} )
       .on('pointerup', () => {this.buttons.newGame.body.setFillStyle(0x3700B3);});
     this.buttons.tutorial = this.newLabeledButton("Tutorial", config.width/2, config.height/2 + 100)
     this.buttons.tutorial.body
       .setInteractive({useHandCursor:true})
       .on('pointerover', () => {this.buttons.tutorial.body.setFillStyle(0x3700B3);})
       .on('pointerout', () => {this.buttons.tutorial.body.setFillStyle(0x6200EE);} )
-      .on('pointerdown', () => {} )
+      .on('pointerdown', () => {this.scene.switch("tutorial");} )
       .on('pointerup', () => {this.buttons.tutorial.body.setFillStyle(0x3700B3);});
 
 
