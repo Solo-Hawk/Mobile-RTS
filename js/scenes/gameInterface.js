@@ -118,12 +118,21 @@ class GameInterface extends Phaser.Scene{
     this.createControlPanelUI()
     this.createFactoryUI()
     this.closeControlPanel()
+    this.setupMinimap()
   }
 
   update(delta, time){
     this.ui.game.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
   }
 
+  setupMinimap(){
+    this.minimap = this.cameras.add(config.width/2 - 500 , 10, 1000, 80).setZoom(0.009).setName('mini');
+    this.minimap.setBackgroundColor(0x002244);
+    this.minimap.scrollX = 1600 - config.width/2;
+    this.minimap.scrollY = 400;
+    this.hitspace = this.add.rectangle(config.width/2 - 500 , 10, 1000, 80, 0xff0000,0.4)
+    this.hitspace.setInteractive()
+  }
   setFocus(context){
     // console.log(context);
     // console.log(context.type);

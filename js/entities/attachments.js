@@ -27,7 +27,7 @@ class Gun extends Attachment{
   constructor(host, texture, x, y){
     super(host, texture, x, y)
     this.range = 4000;
-    this.damage = 20;
+    this.damage = 30;
     this.maxAmmo = 12;
     this.ammo = this.maxAmmo;
     this.firerate = 120 ;
@@ -320,6 +320,12 @@ class SmartMissleLauncherV2 extends Attachment{
     new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(20,160)))
     new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(20,160)))
     new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(20,160)))
+    new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(-160,-20)))
+    new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(-160,-20)))
+    new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(-160,-20)))
+    new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(20,160)))
+    new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(20,160)))
+    new Missle(this.host, this.x, this.y, "missle-red", target.formation.ships[Math.floor(Math.random()*(target.formation.ships.length-1))],this.damage,this.launchtime, this.lifetime, this.missleScale, this.rotation + Phaser.Math.DegToRad(Phaser.Math.Between(20,160)))
   }
   reload(){
     this.reloading = true
@@ -370,7 +376,7 @@ class Missle extends Steerable{
       this.seek(this.target.getPosition(), 0)
 
     }
-    if(this.distanceFrom(this.target) <= this.target.shortest*1.5){
+    if(this.distanceFrom(this.target) <= this.target.shortest / 2){
       this.target.damage(this.damage)
       // console.log("Missle Hit");
       // console.log(this.scene.events.eventNames());
@@ -392,11 +398,11 @@ class Missle extends Steerable{
 class Turret extends Attachment{
   constructor(host, texture, x, y){
     super(host, texture, x, y)
-    this.range = 10000;
-    this.damage = 40;
-    this.maxAmmo = 100;
+    this.range = 8000;
+    this.damage = 20;
+    this.maxAmmo = 120;
     this.ammo = this.maxAmmo;
-    this.firerate = 20 ;
+    this.firerate = 60 ;
     this.reloadTime = 4000
     this.loaded = true;
     this.reloading = false;
@@ -758,7 +764,7 @@ class MegaGun extends Attachment{
       // console.log((this.host.rotation - 15) < shortestAngle &&  shortestAngle < (this.host.rotaiton + 15));
       // console.log(shortestAngle);
       if(
-        line.length() <= this.range && -30 < shortestAngle && shortestAngle < 30){
+        line.length() <= this.range && -180 < shortestAngle && shortestAngle < 180){
         this.fire(this.host.getTarget())
       }
     }

@@ -12,6 +12,7 @@ class Formation{
     // console.log("Formation updating", this);
     // console.log(this.target);
     // console.log(!this.target);
+    if(!this.flagship.alive)this.findFlagship()
     if(!this.target){
       // console.log("Getting new target");
       this.target = this.manager.getNearestTarget(this)
@@ -44,18 +45,27 @@ class Formation{
   }
 
   findFlagship(){
-    // console.log("finding FS");
+    console.log("finding FS");
     for(var i = 0; i < this.ships.length; i++){
       // console.log(this.ships[i].rating);
-      if(this.ships[i].rating > this.flagship.rating || this.flagship == Game.Utils.statics.BLANK){
+      if(this.ships[i].rating > this.flagship.rating || this.flagship == Game.Utils.statics.BLANK || !this.flagship.alive){
+        if(!(this.flagship == Game.Utils.statics.BLANK)){
+          this.flagship.maxLinearSpeed*= 1.25
+          this.flagship.maxLinearAcceleration*= 1.25
+        }
         this.flagship = this.ships[i]
       }
     }
     this.ships.sort((a,b)=>{
       return a.rating - b.rating
     })
-    this.flagship.maxLinearSpeed*= 0.95
-    this.flagship.maxLinearAcceleration*= 0.95
+    if(this.flagship == Game.Utils.statics.BLANK)
+    {
+      console.log("BLANK");
+      return
+    }
+    this.flagship.maxLinearSpeed*= 0.8
+    this.flagship.maxLinearAcceleration*= 0.8
   }
   addUnit(unit){
     if(this.ships.indexOf(unit) == -1){
@@ -82,20 +92,72 @@ class Formation{
     })
   }
   getFormationPosition(ship){
+    //Forms a ring
     var subs = Game.Utils.arrayRemove(this.ships, this.flagship)
+
+    var shipPos = subs.indexOf(ship)
     // console.log(subs.length);
     var placements = []
-    var length = 400 * (subs.length - 1)
-    for(var i = 0; i < Math.ceil(subs.length / 8); i++){
-      var length = 400 * ((subs.length - (i*8)) < 8 ? subs.length - (i*8) + 1 : 8 )
-      for(var j = 0; j < ((subs.length - (i*8)) < 8 ? subs.length - (i*8) + 1 : 8 ); j++){
-        // console.log(i,j,(i*8)+j);
-        var vector = Game.Utils.vector2d((400*j) -(length/2), 400*i)
-            vector.rotate(this.flagship.rotation + Phaser.Math.DegToRad(-90))
-            vector.add(this.flagship.getPosition())
-            placements.push(vector)
+    var spacing = this.flagship.longest * 5
+    var c = 0
+    var i = 0
+    while(c<subs.length){
+      var ringLevel = i;
+      var ringSize = (i+1) * 8
+      var current = c
+      // console.log(subs.length);
+      // console.log(i,c);
+      // console.log(ringLevel);
+      // console.log(ringSize);
+      // console.log(subs.length - current );
+      // console.log((subs.length - current < ringSize ? subs.length - current : ringSize));
+      for(var j = 0; j <(subs.length - current < ringSize ? subs.length - current : ringSize); j++){
+        if(c == shipPos){
+          var vector = Game.Utils.vector2d((spacing*(i+1)),0)
+          vector.rotate(this.flagship.rotation + Phaser.Math.DegToRad(((360 / (subs.length - current < ringSize ? subs.length - current : ringSize)) * (j + 1))-45))
+          vector.add(this.flagship.getPosition())
+          return vector
+        }
+        // console.log("push");
+        c++
+
       }
+      i++
+      // console.log(subs.length);
+      // console.log(c<subs.length-1);
     }
+
+    console.log("Iterated", c);
+
+
+
+    // for(var i = 0; i < Math.ceil(subs.length / 8); i++){
+    //   for(var j = 0; j < ((subs.length - (i*8)) < 8 ? subs.length - (i * 8) + 1 : 8); j++){
+    //     var vector = Game.Utils.vector2d((spacing*i),0)
+    //     vector.rotate(this.flagship.rotation + Phaser.Math.DegToRad((360 / 8) * (j + 1)))
+    //     vector.add(this.flagship.getPosition())
+    //     placements.push(vector)
+    //   }
+    // }
+
+
+    //Forms Support Lines
+    /*{
+      var subs = Game.Utils.arrayRemove(this.ships, this.flagship)
+      // console.log(subs.length);
+      var placements = []
+      var length = 400 * (subs.length - 1)
+      for(var i = 0; i < Math.ceil(subs.length / 8); i++){
+        var length = 400 * ((subs.length - (i*8)) < 8 ? subs.length - (i*8) + 1 : 8 )
+        for(var j = 0; j < ((subs.length - (i*8)) < 8 ? subs.length - (i*8) + 1 : 8 ); j++){
+          // console.log(i,j,(i*8)+j);
+          var vector = Game.Utils.vector2d((400*j) -(length/2), 400*i)
+              vector.rotate(this.flagship.rotation + Phaser.Math.DegToRad(-90))
+              vector.add(this.flagship.getPosition())
+              placements.push(vector)
+        }
+      }
+    }*/
 
 
 
@@ -115,7 +177,6 @@ class Formation{
     // vector.add(this.flagship.getPosition())
     // placements.push(vector)
 
-    return placements[subs.indexOf(ship)]
 
   }
 

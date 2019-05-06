@@ -1,6 +1,7 @@
 class GameManager {
   constructor(scene) {
     this.scene = scene
+    this.running = true
     this.ships = []
     this.player = {
       base: null,
@@ -27,8 +28,16 @@ class GameManager {
 
   makeListeners(){
     this.scene.events.on('missle-destroy',this.createExplosion,this)
+    this.scene.events.on('base-destroy',this.gameOver,this)
     // console.log(this.scene.events.eventNames());
   }
+
+  gameOver(team){
+    console.log("GAME OVER");
+    this.running = false
+    this.scene.impact.world.pause()
+  }
+
   createExplosion(position){
     var explosion = this.explosions.get(position.x, position.y)
     explosion.setDepth(10);
@@ -43,6 +52,9 @@ class GameManager {
     explosion.play('explode')
   }
   update(){
+    if (!this.running) {
+      return
+    }
     // console.log(this.formations);
     // console.log(this.player.formations);
     // console.log(this.comp.formations);
@@ -324,7 +336,7 @@ class Factory{
     s.addAttachment(new Turret(s,'turret-01',-300,200).setScale(2))
     s.addAttachment(new Turret(s,'turret-01',100,-200).setScale(2))
     s.addAttachment(new Turret(s,'turret-01',-300,-200).setScale(2))
-    s.addAttachment(new SmartMissleLauncherV2(s,'missle-red',0,0,50,30,3000,21000, 120, 2000,5,3))
+    s.addAttachment(new SmartMissleLauncherV2(s,'missle-red',0,0,300,12,3000,21000, 240, 2000,5,3))
     // s.addAttachment(new SmartMissleLauncher(s,'missle-red',0,0,50,30,10000,16000, 300, 1400,400,3))
     if(formation){
       formation.addUnit(s)

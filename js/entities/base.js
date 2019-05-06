@@ -21,6 +21,9 @@ class BaseNode extends Steerable{
     this.formation = scene.gameManager.create.formation(this.team, [this])
     this.width = this.width * 5
     this.height = this.height * 5
+
+    this.maxHealth = 100000
+    this.health = this.maxHealth
   }
   update(){
     this.rotation = this.rotation + (1 / 60)
@@ -32,6 +35,11 @@ class BaseNode extends Steerable{
 
   }
   damage(d){
-
+    this.health -= d
+    // console.log(this.health);
+    if(this.health <= 0){
+      // console.log("base is dead");
+      this.scene.events.emit("base-destroy", this.team)
+    }
   }
 }

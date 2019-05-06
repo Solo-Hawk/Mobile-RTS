@@ -151,7 +151,7 @@ class Fighter extends BaseShip{
           }
           break;
         case 4:
-          this.seek(this.formation.getFormationPosition(this),8,8)
+          this.seek(this.formation.getFormationPosition(this),1,1)
           // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
           if(this.distanceFrom(this.target) <= this.ranges.engageRange){
             this.state = 3
@@ -246,8 +246,8 @@ class Frigate extends BaseShip{
           }
           break;
         case 4:
-          this.seek(this.formation.getFormationPosition(this),8,8)
-          // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
+          this.seek(this.formation.getFormationPosition(this),1,1)
+          this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
           if(this.distanceFrom(this.target) <= this.ranges.engageRange){
             this.target = this.getNearestTarget() || this.target
             this.state = 1
