@@ -18,17 +18,15 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
     this.mainCamera = this.cameras.getCamera("");
     this.mainCamera.setZoom(0.12)
-    this.mainCamera.setBounds(-45000,-5000,90000,10000,true)
+    this.mainCamera.setBounds(-50000,-5000,100000,10000,true)
     this.cameraFrame = this.add.rectangle(this.mainCamera.scrollX + config.width/2, this.mainCamera.scrollY + config.height/2, this.mainCamera.width / 0.12, this.mainCamera.height/0.12, 0x0000ff, 0.2)
 
     this.cameraFrame.lineWidth = 3
     this.cameraFrame.strokeColor = 0x0000ff
-    this.minimap = this.cameras.add(config.width/2 - 500 , 10, 1000, 80).setZoom(0.009).setName('mini');
+    this.minimap = this.cameras.add(config.width/2 - 500 , 10, 900, 80).setZoom(0.009).setName('mini');
     this.minimap.setBackgroundColor(0x002244);
     this.minimap.scrollX = 1600 - config.width/2;
     this.minimap.scrollY = 400;
-    this.hitspace = this.add.rectangle(config.width/2 - 500 , 10, 1000, 80, 0xff0000,0.4)
-    this.hitspace.setInteractive()
 
     var formation1 = this.gameManager.create.formation(Game.Utils.statics.teams.PLAYER)
     var formation2 = this.gameManager.create.formation(Game.Utils.statics.teams.COMPUTER)

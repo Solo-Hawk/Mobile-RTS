@@ -126,12 +126,12 @@ class GameInterface extends Phaser.Scene{
   }
 
   setupMinimap(){
-    this.minimap = this.cameras.add(config.width/2 - 500 , 10, 1000, 80).setZoom(0.009).setName('mini');
-    this.minimap.setBackgroundColor(0x002244);
-    this.minimap.scrollX = 1600 - config.width/2;
-    this.minimap.scrollY = 400;
-    this.hitspace = this.add.rectangle(config.width/2 - 500 , 10, 1000, 80, 0xff0000,0.4)
-    this.hitspace.setInteractive()
+    this.hitspace = this.add.rectangle(config.width/2 , 50, 750, 80, 0xff0000,0)
+    this.hitspace.setInteractive().on("pointermove", (pos,x,y,event)=>{
+      console.log(x/this.hitspace.width);
+      this.gameScene.cameras.main.scrollX = 80000 * (x/this.hitspace.width) - 41940
+      //41940 39660
+    },this)
   }
   setFocus(context){
     // console.log(context);
