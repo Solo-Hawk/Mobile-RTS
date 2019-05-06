@@ -1,12 +1,14 @@
 class GameInterface extends Phaser.Scene{
   constructor(){
     super("game-interface");
+
+    this.intervals = []
+    this.timeouts = []
   }
 
   init(gameScene){
     this.difficultyIncrement = 0.2
     this.gameScene = gameScene;
-    console.log(this.gameScene, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     this.textStyles = {
         main:{
           fontSize: '40px',
@@ -99,7 +101,7 @@ class GameInterface extends Phaser.Scene{
         }
       }
     this.values.game = {
-        constructionUnits: 100
+        constructionUnits: 300
       }
     this.ui = {}
   }
@@ -109,7 +111,7 @@ class GameInterface extends Phaser.Scene{
   }
 
   create(){
-    console.log("HERE");
+    // console.log("HERE");
 
 
     this.events.on("set-focus", (interfaceComponent)=>{
@@ -120,22 +122,24 @@ class GameInterface extends Phaser.Scene{
     this.createFactoryUI()
     this.closeControlPanel()
     this.setupMinimap()
-    setInterval((manager)=>{
+    this.intervals.push(setInterval((manager)=>{
       manager.values.game.constructionUnits += 2 + (this.difficultyIncrement * (this.gameScene.time.now/30000))
-    },300,this)
+    },300,this))
   }
 
   update(delta, time){
     this.ui.game.constructionUnitsLabel.setText(Math.floor(this.values.game.constructionUnits)+" CU")
+    this.ui.game.playerHealth.setText  ("Your Health: "  + Math.ceil((this.gameScene.gameManager.player.base.health / this.gameScene.gameManager.player.base.maxHealth)*100) + "%")
+    this.ui.game.computerHealth.setText("Enemy Health: "  + Math.ceil((this.gameScene.gameManager.comp.base.health / this.gameScene.gameManager.comp.base.maxHealth)*100) + "%")
     this.updateLabels()
 
   }
 
   setupMinimap(){
-    this.hitspace = this.add.rectangle(config.width/2 , 50, 750, 80, 0xff0000,0)
+    this.hitspace = this.add.rectangle(config.width/2 - 80 , config.height - 50, 750, 80, 0xff0000,0)
     this.hitspace.setInteractive().on("pointermove", (pos,x,y,event)=>{
-      console.log(x/this.hitspace.width);
-      this.gameScene.cameras.main.scrollX = 80000 * (x/this.hitspace.width) - 41940
+      // console.log(x/this.hitspace.width);
+      this.gameScene.cameras.main.scrollX = 80000 * ((x)/this.hitspace.width) - 41940
       //41940 39660
     },this)
   }
@@ -157,7 +161,9 @@ class GameInterface extends Phaser.Scene{
   }
   createGameUI(){
     this.ui.game = {}
-    this.ui.game.constructionUnitsLabel = new RectLabelButton(this,"0 CU"         , this.textStyles.sub, 1, 105 , 40 , 180, 40, 0x007777, 1)
+    this.ui.game.constructionUnitsLabel = new RectLabelButton(this,"0 CU"         , this.textStyles.sub, 1, 125 , 70 , 240, 40, 0x007777, 1)
+    this.ui.game.playerHealth = new RectLabelButton(this,"Your Health: 100%"         , this.textStyles.sub, 1, 125 , 40 , 240, 40, 0x007777, 1)
+    this.ui.game.computerHealth = new RectLabelButton(this,"Enemy Health: 100%"         , this.textStyles.sub, 1, 2160 , 40 , 240, 40, 0x007777, 1)
   }
   createControlPanelUI(){
     this.ui.unitPanel = {}
@@ -171,7 +177,31 @@ class GameInterface extends Phaser.Scene{
     this.ui.unitPanel.item2 = new RectLabelButton(this,""  , this.textStyles.main, 1, config.width/2 - 600, config.height - 120, 400, 60, 0x0000ff, 1)
     this.ui.unitPanel.item3 = new RectLabelButton(this,""  , this.textStyles.main, 1, config.width/2 - 600, config.height - 40, 400, 60, 0x0000ff, 1)
   }
+  playerWin(){
+    new RectLabelButton(this,"YOU WIN"        , this.textStyles.main, 1, config.width/2 , config.height/2 , 500, 100, 0x007777, 1)
+    this.returnMenu()
+  }
+  compWin(){
+    new RectLabelButton(this,"YOU LOSE"        , this.textStyles.main, 1, config.width/2 , config.height/2 , 500, 100, 0x007777, 1)
+    this.returnMenu()
+  }
+  returnMenu(){
+    var button = new RectLabelButton(this,"Menu"         , this.textStyles.sub, 1, config.width/2 , config.height/2 + 80 , 240, 40, 0x007777, 1)
+    this.intervals.forEach((i)=>{
+      clearInterval(i)
+    })
+    this.timeouts.forEach((t)=>{
+      clearTimeout(t)
+    })
+    button.setInteractive()
+      .on('pointerdown', () => {setTimeout((scene)=>{
+        scene.stop("level-development");
+        scene.start("mainmenu");
+        scene.switch("mainmenu");
+        scene.remove("game-interface");},100,this.scene)
 
+      } ,this)
+  }
   openControlPanel(context){
     // console.log("Open");
     this.setControlPanelContext(context)
@@ -318,7 +348,7 @@ class GameInterface extends Phaser.Scene{
     var newRating = this.values.factory.rating + (this.values.config.fighters.light.rating * value)
     var newCost = this.values.factory.cost + (this.values.config.fighters.light.cost * value)
     var newCapacity = this.values.factory.capacity + value
-    console.log(newCost, this.values.game.constructionUnits);
+    // console.log(newCost, this.values.game.constructionUnits);
     if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity || newCost > this.values.game.constructionUnits){
       return
     }

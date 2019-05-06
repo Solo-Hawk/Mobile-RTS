@@ -17,11 +17,6 @@ var config = {
     target: 30,
   },
   scene: [SceneLoader, SceneMenu, SceneLevelDevelopment],
-  plugins: {
-    scene: [
-      { key: "NavMeshPlugin", plugin: PhaserNavMeshPlugin, mapping: "navMeshPlugin", start: true }
-    ]
-  },
   scale:{
     mode:Phaser.Scale.FIT
   }

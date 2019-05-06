@@ -6,15 +6,15 @@ class SceneLevelDevelopment extends Phaser.Scene{
     this.gameManager = new GameManager(this)
     this.scene.add("game-interface",new GameInterface(), false, this)
     this.scene.run("game-interface")
-    this.GameInterface = this.scene.get("game-interface")
-    this.gameManager.makeListeners()
-    this.impact.world.setBounds(-45000,-4000,90000,8000)
+    this.gameInterface = this.scene.get("game-interface")
+    this.impact.world.setBounds(-47000,-4500,94000,9000)
 
 
   }
   create(){
-    console.log("CREATED HERE");
+    // console.log("CREATED HERE");
 
+    this.gameManager.make()
 
     this.mainCamera = this.cameras.getCamera("");
     this.mainCamera.setZoom(0.12)
@@ -23,7 +23,7 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
     this.cameraFrame.lineWidth = 3
     this.cameraFrame.strokeColor = 0x0000ff
-    this.minimap = this.cameras.add(config.width/2 - 500 , 10, 900, 80).setZoom(0.009).setName('mini');
+    this.minimap = this.cameras.add(config.width/2 - 500 , config.height - 90, 900, 80).setZoom(0.009).setName('mini');
     this.minimap.setBackgroundColor(0x002244);
     this.minimap.scrollX = 1600 - config.width/2;
     this.minimap.scrollY = 400;
@@ -47,12 +47,12 @@ class SceneLevelDevelopment extends Phaser.Scene{
     if (this.cursors.left.isDown)
     {
         this.cameras.main.scrollX += - 300;
-        console.log("left",this.cameras.main.scrollX);
+        // console.log("left",this.cameras.main.scrollX);
     }
     else if (this.cursors.right.isDown)
     {
         this.cameras.main.scrollX += 300
-        console.log("right",this.cameras.main.scrollX);
+        // console.log("right",this.cameras.main.scrollX);
     }
 
     // console.clear();

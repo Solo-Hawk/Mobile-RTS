@@ -128,6 +128,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     this.setLinearVelocity(force)
   }
   seek(target, radius, brace){
+    if(!target)return
     brace = brace || 0
     // console.log("seek");
     this.desiredVelocity = target.subtract(this.getPosition())

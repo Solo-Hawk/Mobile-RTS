@@ -45,7 +45,7 @@ class Formation{
   }
 
   findFlagship(){
-    console.log("finding FS");
+    // console.log("finding FS");
     for(var i = 0; i < this.ships.length; i++){
       // console.log(this.ships[i].rating);
       if(this.ships[i].rating > this.flagship.rating || this.flagship == Game.Utils.statics.BLANK || !this.flagship.alive){
@@ -61,7 +61,7 @@ class Formation{
     })
     if(this.flagship == Game.Utils.statics.BLANK)
     {
-      console.log("BLANK");
+      // console.log("BLANK");
       return
     }
     this.flagship.maxLinearSpeed*= 0.8
@@ -98,7 +98,7 @@ class Formation{
     var shipPos = subs.indexOf(ship)
     // console.log(subs.length);
     var placements = []
-    var spacing = this.flagship.longest * 5
+    var spacing = this.flagship.longest * 2
     var c = 0
     var i = 0
     while(c<subs.length){
@@ -127,7 +127,7 @@ class Formation{
       // console.log(c<subs.length-1);
     }
 
-    console.log("Iterated", c);
+    // console.log("Iterated", c);
 
 
 

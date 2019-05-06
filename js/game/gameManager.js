@@ -23,21 +23,28 @@ class GameManager {
       defaultKey: 'smoke',
       maxSize: 50
     })
-    this.computerPlayer = new ComputerPlayer(this)
-    this.computerPlayer.start()
     console.log(this.explosions);
   }
 
-  makeListeners(){
+  make(){
+
+    this.computerPlayer = new ComputerPlayer(this)
+    this.computerPlayer.start()
     this.scene.events.on('missle-destroy',this.createExplosion,this)
     this.scene.events.on('base-destroy',this.gameOver,this)
     // console.log(this.scene.events.eventNames());
   }
 
   gameOver(team){
-    console.log("GAME OVER");
+    // console.log("GAME OVER");
     this.running = false
     this.scene.impact.world.pause()
+    if(team == Game.Utils.statics.teams.PLAYER){
+      this.scene.gameInterface.compWin()
+    }else{
+      this.scene.gameInterface.playerWin()
+    }
+
   }
 
   createExplosion(position){
@@ -191,7 +198,7 @@ class GameManager {
 class ComputerPlayer{
   constructor(manager){
     this.gameManager = manager
-    this.constructionUnits = 200
+    this.constructionUnits = 400
     this.difficultyIncrement = 0.4 //Increase in income per 30 seconds
     this.thinkrate = 5000
     this.thinkratevariance = 0.3
@@ -260,19 +267,18 @@ class ComputerPlayer{
 
   }
   start(){
-    setInterval((computer)=>{
+    console.log(this.gameManager);
+    this.gameManager.scene.gameInterface.intervals.push(setInterval((computer)=>{
       computer.values.game.constructionUnits += 1 + (this.difficultyIncrement * (computer.gameManager.scene.time.now/30000))
-    },300,this)
+    },300,this))
     this.newThink()
 
   }
   newThink(){
-    console.log(this.thinkrate);
-    setTimeout((computer)=>{
-      console.log("BIG THINK");
+    this.gameManager.scene.gameInterface.timeouts.push(setTimeout((computer)=>{
       computer.build()
       computer.newThink()
-    },this.thinkrate + ((Math.random() * (this.thinkrate * this.thinkratevariance)) - (this.thinkrate * this.thinkratevariance)/2 ),this)
+    },this.thinkrate,this))
   }
   build(){
     var built = false
@@ -473,8 +479,8 @@ class Factory{
     var spawnPos = this.getSpawn(team)
     var s = new Fighter(this.scene, spawnPos.x, spawnPos.y, 'light-fighter-'+this.getColor(team), team)
     s.rating = 10
-    s.health = 80 * 10
-    s.maxLinearSpeed = 6000
+    s.health = 80
+    s.maxLinearSpeed = 20000
     s.maxLinearAcceleration = 400
     s.ranges = {
       attackRange : 3000,
@@ -495,7 +501,7 @@ class Factory{
     var spawnPos = this.getSpawn(team)
     var s = new Fighter(this.scene, spawnPos.x, spawnPos.y, 'heavy-fighter-'+this.getColor(team), team)
     s.rating = 30
-    s.health = 260 * 10
+    s.health = 260
     s.maxLinearSpeed = 4800
     s.maxLinearAcceleration = 350
     s.ranges = {
@@ -518,7 +524,7 @@ class Factory{
     var spawnPos = this.getSpawn(team)
     var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'swatter-frigate-'+this.getColor(team), team)
     s.rating = 140
-    s.health = 600 * 10
+    s.health = 600
     s.maxLinearSpeed = 3000
     s.maxLinearAcceleration = 20
     s.ranges = {
@@ -541,7 +547,7 @@ class Factory{
     var spawnPos = this.getSpawn(team)
     var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'bastion-frigate-'+this.getColor(team), team)
     s.rating = 300
-    s.health = 1800 * 10
+    s.health = 1800
     s.maxLinearSpeed = 2200
     s.maxLinearAcceleration = 12
     s.ranges = {
@@ -565,7 +571,7 @@ class Factory{
     var spawnPos = this.getSpawn(team)
     var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'slammer-frigate-'+this.getColor(team), team)
     s.rating = 350
-    s.health = 1800 * 10
+    s.health = 1800
     s.maxLinearSpeed = 2200
     s.maxLinearAcceleration = 12
     s.ranges = {
@@ -591,7 +597,7 @@ class Factory{
     var spawnPos = this.getSpawn(team)
     var s = new Frigate(this.scene, spawnPos.x, spawnPos.y, 'leviathan-cruiser-'+this.getColor(team), team)
     s.rating = 600
-    s.health = 6500 * 10
+    s.health = 6500
     s.maxLinearSpeed = 2200
     s.maxLinearAcceleration = 12
     s.ranges = {

@@ -13,8 +13,8 @@ var resources = [
   ['leviathan-cruiser-blue', 'assets/ships/blue/ship_blue_levithan.png'],
   ['hunter-cruiser-red', 'assets/ships/red/ship_red_hunter.png'],
   ['hunter-cruiser-blue', 'assets/ships/blue/ship_blue_hunter.png'],
-  ['home-base-red'     , 'assets/buildings/home_blue.png'],
-  ['home-base-blue'    , 'assets/buildings/home_red.png'],
+  ['home-base-red'     , 'assets/buildings/home_red.png'],
+  ['home-base-blue'    , 'assets/buildings/home_blue.png'],
   ['missle-red', 'assets/missles/spaceMissiles_009.png'],
   ['missle-blue', 'assets/missles/spaceMissiles_010.png'],
   ['turret-01', 'assets/turret/turret01.png']
@@ -24,7 +24,7 @@ class SceneLoader extends Phaser.Scene{
     super("loader")
   }
   preload(){
-    console.log(this);
+    // console.log(this);
     this.createProgressBar.call(this)
     // All Main Assets are loaded here
 

@@ -399,11 +399,11 @@ class Turret extends Attachment{
   constructor(host, texture, x, y){
     super(host, texture, x, y)
     this.range = 8000;
-    this.damage = 20;
-    this.maxAmmo = 120;
+    this.damage = 10;
+    this.maxAmmo = 40;
     this.ammo = this.maxAmmo;
     this.firerate = 60 ;
-    this.reloadTime = 4000
+    this.reloadTime = 2000
     this.loaded = true;
     this.reloading = false;
     this.target = Game.Utils.statics.BLANK
@@ -447,6 +447,7 @@ class Turret extends Attachment{
       // console.log("Pew");
       this.graphics = this.host.scene.add.graphics({x:0, y:0})
       this.graphics.lineStyle(10, this.host.team == Game.Utils.statics.teams.PLAYER? 0x0000ff : 0xff0000, 1.0);
+      this.graphics.setDepth(7)
       this.graphics.beginPath();
       this.graphics.moveTo(this.x, this.y);
       var offX = Phaser.Math.Between(-target.width/2, target.width/2)
@@ -555,6 +556,7 @@ class HeavyTurret extends Attachment{
       // console.log("Pew");
       this.graphics = this.host.scene.add.graphics({x:0, y:0})
       this.graphics.lineStyle(30, this.host.team == Game.Utils.statics.teams.PLAYER? 0x0000ff : 0xff0000, 1.0);
+      this.graphics.setDepth(7)
       this.graphics.beginPath();
       this.graphics.moveTo(this.x, this.y);
       var offX = Phaser.Math.Between(-target.width/2, target.width/2)
@@ -663,6 +665,7 @@ class SuperTurret extends Attachment{
       // console.log("Pew");
       this.graphics = this.host.scene.add.graphics({x:0, y:0})
       this.graphics.lineStyle(70, this.host.team == Game.Utils.statics.teams.PLAYER? 0x0000ff : 0xff0000, 1.0);
+      this.graphics.setDepth(7)
       this.graphics.beginPath();
       this.graphics.moveTo(this.x, this.y);
       var offX = Phaser.Math.Between(-target.width/2, target.width/2)
