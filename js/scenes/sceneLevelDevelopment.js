@@ -36,55 +36,6 @@ class SceneLevelDevelopment extends Phaser.Scene{
     this.gameManager.create.playerBaseNode(-40000,500)
     this.gameManager.create.computerBaseNode(40000,500)
 
-    for(var i = 0; i < 1; i++){
-      setTimeout((scene)=>{
-        var formation = scene.gameManager.create.formation(Game.Utils.statics.teams.PLAYER)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
-
-
-        formation.findFlagship()
-      },8000*i, this)
-
-    }
-    for(var i = 0; i < 1; i++){
-      setTimeout((scene)=>{
-        var formation = scene.gameManager.create.formation(Game.Utils.statics.teams.COMPUTER)
-        // scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-
-        formation.findFlagship()
-      },100+ (10000*i), this)
-    }
 
     this.cursors = this.input.keyboard.createCursorKeys();
 

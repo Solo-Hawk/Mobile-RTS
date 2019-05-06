@@ -4,6 +4,7 @@ class GameInterface extends Phaser.Scene{
   }
 
   init(gameScene){
+    this.difficultyIncrement = 0.2
     this.gameScene = gameScene;
     console.log(this.gameScene, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     this.textStyles = {
@@ -98,7 +99,7 @@ class GameInterface extends Phaser.Scene{
         }
       }
     this.values.game = {
-        constructionUnits: 1000
+        constructionUnits: 100
       }
     this.ui = {}
   }
@@ -119,10 +120,15 @@ class GameInterface extends Phaser.Scene{
     this.createFactoryUI()
     this.closeControlPanel()
     this.setupMinimap()
+    setInterval((manager)=>{
+      manager.values.game.constructionUnits += 2 + (this.difficultyIncrement * (this.gameScene.time.now/30000))
+    },300,this)
   }
 
   update(delta, time){
-    this.ui.game.constructionUnitsLabel.setText(this.values.game.constructionUnits+" CU")
+    this.ui.game.constructionUnitsLabel.setText(Math.floor(this.values.game.constructionUnits)+" CU")
+    this.updateLabels()
+
   }
 
   setupMinimap(){
@@ -435,13 +441,31 @@ class GameInterface extends Phaser.Scene{
     // TODO: Call gamemanager and create formation
     var formation = this.gameScene.gameManager.create.formation(Game.Utils.statics.teams.PLAYER)
     for(var i = 0; i < this.values.factory.fighters.light; i++){
-      var unit = this.gameScene.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-300, 300),Phaser.Math.Between(-300, 300))
-      formation.addUnit(unit)
+      this.gameScene.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation)
     }
     for(var i = 0; i < this.values.factory.fighters.heavy; i++){
-      var unit = this.gameScene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER, Phaser.Math.Between(-300, 300),Phaser.Math.Between(-300, 300))
-      formation.addUnit(unit)
+      this.gameScene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
     }
+    for(var i = 0; i < this.values.factory.frigates.swatter; i++){
+      this.gameScene.gameManager.create.swatterFrigate(Game.Utils.statics.teams.PLAYER,formation)
+    }
+    for(var i = 0; i < this.values.factory.frigates.bastion; i++){
+      this.gameScene.gameManager.create.bastionFrigate(Game.Utils.statics.teams.PLAYER,formation)
+    }
+    for(var i = 0; i < this.values.factory.frigates.slammer; i++){
+      this.gameScene.gameManager.create.slammerFrigate(Game.Utils.statics.teams.PLAYER,formation)
+    }
+    for(var i = 0; i < this.values.factory.cruisers.leviathan; i++){
+      this.gameScene.gameManager.create.leviathanCruiser(Game.Utils.statics.teams.PLAYER,formation)
+    }
+    for(var i = 0; i < this.values.factory.cruisers.hunter; i++){
+      this.gameScene.gameManager.create.hunterCruiser(Game.Utils.statics.teams.PLAYER,formation)
+    }
+
+    formation.findFlagship()
+
+    this.values.game.constructionUnits -= this.values.factory.cost
+
 
     this.values.factory.fighters.light     = 0
     this.values.factory.fighters.heavy     = 0

@@ -23,6 +23,8 @@ class GameManager {
       defaultKey: 'smoke',
       maxSize: 50
     })
+    this.computerPlayer = new ComputerPlayer(this)
+    this.computerPlayer.start()
     console.log(this.explosions);
   }
 
@@ -184,6 +186,273 @@ class GameManager {
     return this.player.formations
   }
 
+}
+
+class ComputerPlayer{
+  constructor(manager){
+    this.gameManager = manager
+    this.constructionUnits = 200
+    this.difficultyIncrement = 0.4 //Increase in income per 30 seconds
+    this.thinkrate = 5000
+    this.thinkratevariance = 0.3
+    this.values = {};
+    this.values.config = {
+        formation:{
+          maxRating: 180,
+          maxCapacity: 30
+        },
+        fighters: {
+          light: {
+            cost: 10,
+            rating: 1
+          },
+          heavy: {
+            cost: 25,
+            rating: 2
+          }
+        },
+        frigates: {
+          swatter:{
+            cost: 110,
+            rating: 14
+          },
+          bastion:{
+            cost: 135,
+            rating: 16
+          },
+          slammer:{
+            cost: 180,
+            rating: 20
+          }
+        },
+        cruisers: {
+          leviathan: {
+            cost: 700,
+            rating: 100
+          },
+          hunter: {
+            cost: 950,
+            rating: 124
+          }
+        }
+      }
+    this.values.factory = {
+        rating: 0,
+        capacity: 0,
+        cost:0,
+        fighters: {
+          heavy: 0,
+          light: 0
+        },
+        frigates: {
+          swatter:0,
+          bastion:0,
+          slammer:0
+        },
+        cruisers: {
+          leviathan: 0,
+          hunter: 0
+        }
+      }
+    this.values.game = {
+        constructionUnits: 100
+      }
+
+  }
+  start(){
+    setInterval((computer)=>{
+      computer.values.game.constructionUnits += 1 + (this.difficultyIncrement * (computer.gameManager.scene.time.now/30000))
+    },300,this)
+    this.newThink()
+
+  }
+  newThink(){
+    console.log(this.thinkrate);
+    setTimeout((computer)=>{
+      console.log("BIG THINK");
+      computer.build()
+      computer.newThink()
+    },this.thinkrate + ((Math.random() * (this.thinkrate * this.thinkratevariance)) - (this.thinkrate * this.thinkratevariance)/2 ),this)
+  }
+  build(){
+    var built = false
+    var formation = {
+      maxRating: 180,
+      maxCapacity: 30
+    }
+    this.changeLightFighter(Math.round(Math.random()*10))
+    this.changeHeavyFighter(Math.round(Math.random()*6))
+    this.changeSwatterFrigate(Math.round(Math.random()*4))
+    this.changeBastionFrigate(Math.round(Math.random()*3))
+    this.changeSlammerFrigate(Math.round(Math.random()*2))
+    this.changeHunterCruiser(Math.round(Math.random()*1))
+    this.changeLeviathanCruiser(Math.round(Math.random()*1))
+    this.launchFormation();
+  }
+  changeLightFighter(value){
+    var newValue = this.values.factory.fighters.light + value
+    var newRating = this.values.factory.rating + (this.values.config.fighters.light.rating * value)
+    var newCost = this.values.factory.cost + (this.values.config.fighters.light.cost * value)
+    var newCapacity = this.values.factory.capacity + value
+    console.log(newCost, this.values.game.constructionUnits);
+    if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity || newCost > this.values.game.constructionUnits){
+      return
+    }
+    if(newValue < 0){
+      return
+    }
+    this.values.factory.fighters.light = newValue
+    this.values.factory.capacity = newCapacity
+    this.values.factory.rating = newRating
+    this.values.factory.cost = newCost
+
+  }
+  changeHeavyFighter(value){
+    var newValue = this.values.factory.fighters.heavy + value
+    var newRating = this.values.factory.rating + (this.values.config.fighters.heavy.rating  * value)
+    var newCost = this.values.factory.cost + (this.values.config.fighters.heavy.cost * value)
+    var newCapacity = this.values.factory.capacity + value
+    if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity || newCost > this.values.game.constructionUnits){
+      return
+    }
+    if(newValue < 0){
+      return
+    }
+    this.values.factory.fighters.heavy = newValue
+    this.values.factory.capacity = newCapacity
+    this.values.factory.rating = newRating
+    this.values.factory.cost = newCost
+
+  }
+  changeSwatterFrigate(value){
+    var newValue = this.values.factory.frigates.swatter + value
+    var newRating = this.values.factory.rating + (this.values.config.frigates.swatter.rating * value)
+    var newCost = this.values.factory.cost + (this.values.config.frigates.swatter.cost * value)
+    var newCapacity = this.values.factory.capacity + value
+    if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity || newCost > this.values.game.constructionUnits){
+      return
+    }
+    if(newValue < 0){
+      return
+    }
+    this.values.factory.frigates.swatter = newValue
+    this.values.factory.capacity = newCapacity
+    this.values.factory.rating = newRating
+    this.values.factory.cost = newCost
+
+  }
+  changeBastionFrigate(value){
+    var newValue = this.values.factory.frigates.bastion + value
+    var newRating = this.values.factory.rating + (this.values.config.frigates.bastion.rating * value)
+    var newCost = this.values.factory.cost + (this.values.config.frigates.bastion.cost * value)
+    var newCapacity = this.values.factory.capacity + value
+    if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity || newCost > this.values.game.constructionUnits){
+      return
+    }
+    if(newValue < 0){
+      return
+    }
+    this.values.factory.frigates.bastion = newValue
+    this.values.factory.capacity = newCapacity
+    this.values.factory.rating = newRating
+    this.values.factory.cost = newCost
+
+  }
+  changeSlammerFrigate(value){
+    var newValue = this.values.factory.frigates.slammer + value
+    var newRating = this.values.factory.rating + (this.values.config.frigates.slammer.rating * value)
+    var newCost = this.values.factory.cost + (this.values.config.frigates.slammer.cost * value)
+    var newCapacity = this.values.factory.capacity + value
+    if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity || newCost > this.values.game.constructionUnits){
+      return
+    }
+    if(newValue < 0){
+      return
+    }
+    this.values.factory.frigates.slammer = newValue
+    this.values.factory.capacity = newCapacity
+    this.values.factory.rating = newRating
+    this.values.factory.cost = newCost
+
+  }
+  changeHunterCruiser(value){
+    var newValue = this.values.factory.cruisers.hunter + value
+    var newRating = this.values.factory.rating + (this.values.config.cruisers.hunter.rating * value)
+    // var newCapacity = this.values.factory.capacity + value
+    // if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity){
+    var newCost = this.values.factory.cost + (this.values.config.cruisers.hunter.cost * value)
+    if(newRating > this.values.config.formation.maxRating || newCost > this.values.game.constructionUnits){
+      return;
+    }
+    if(newValue < 0){
+      return
+    }
+    this.values.factory.cruisers.hunter = newValue
+    // this.values.factory.capacity = newCapacity
+    this.values.factory.rating = newRating
+    this.values.factory.cost = newCost
+
+  }
+  changeLeviathanCruiser(value){
+    var newValue = this.values.factory.cruisers.leviathan + value
+    var newRating = this.values.factory.rating + (this.values.config.cruisers.leviathan.rating * value)
+    // var newCapacity = this.values.factory.capacity + value
+    // if(newRating > this.values.config.formation.maxRating || newCapacity > this.values.config.formation.maxCapacity){
+    var newCost = this.values.factory.cost + (this.values.config.cruisers.leviathan.cost * value)
+    if(newRating > this.values.config.formation.maxRating || newCost > this.values.game.constructionUnits){
+      return;
+    }
+    if(newValue < 0){
+      return
+    }
+    this.values.factory.cruisers.leviathan = newValue
+    // this.values.factory.capacity = newCapacity
+    this.values.factory.rating = newRating
+    this.values.factory.cost = newCost
+
+  }
+  launchFormation(){
+    // console.log("launch");
+    // TODO: Call gamemanager and create formation
+    var formation = this.gameManager.create.formation(Game.Utils.statics.teams.COMPUTER)
+    for(var i = 0; i < this.values.factory.fighters.light; i++){
+      this.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
+    }
+    for(var i = 0; i < this.values.factory.fighters.heavy; i++){
+      this.gameManager.create.heavyFighter(Game.Utils.statics.teams.COMPUTER,formation)
+    }
+    for(var i = 0; i < this.values.factory.frigates.swatter; i++){
+      this.gameManager.create.swatterFrigate(Game.Utils.statics.teams.COMPUTER,formation)
+    }
+    for(var i = 0; i < this.values.factory.frigates.bastion; i++){
+      this.gameManager.create.bastionFrigate(Game.Utils.statics.teams.COMPUTER,formation)
+    }
+    for(var i = 0; i < this.values.factory.frigates.slammer; i++){
+      this.gameManager.create.slammerFrigate(Game.Utils.statics.teams.COMPUTER,formation)
+    }
+    for(var i = 0; i < this.values.factory.cruisers.leviathan; i++){
+      this.gameManager.create.leviathanCruiser(Game.Utils.statics.teams.COMPUTER,formation)
+    }
+    for(var i = 0; i < this.values.factory.cruisers.hunter; i++){
+      this.gameManager.create.hunterCruiser(Game.Utils.statics.teams.COMPUTER,formation)
+    }
+
+    formation.findFlagship()
+
+    this.values.game.constructionUnits -= this.values.factory.cost
+
+    this.values.factory.fighters.light     = 0
+    this.values.factory.fighters.heavy     = 0
+    this.values.factory.frigates.swatter   = 0
+    this.values.factory.frigates.bastion   = 0
+    this.values.factory.frigates.slammer   = 0
+    this.values.factory.cruisers.hunter    = 0
+    this.values.factory.cruisers.leviathan = 0
+    this.values.factory.capacity           = 0
+    this.values.factory.rating             = 0
+    this.values.factory.cost               = 0
+
+  }
 }
 
 class Factory{
