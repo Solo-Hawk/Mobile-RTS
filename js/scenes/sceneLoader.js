@@ -96,7 +96,7 @@ class SceneLoader extends Phaser.Scene{
         y: height / 2 - 5,
         text: '',
         style: {
-            font: '100px monospace',
+            font: '30px monospace',
             fill: '#ffffff'
         }
     });
