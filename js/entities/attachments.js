@@ -10,6 +10,7 @@ class Attachment extends Phaser.GameObjects.Sprite{
     this.py = py || 0;
 
     this.update()
+    this.setDepth(100)
   }
 
   update(){
@@ -26,10 +27,10 @@ class Gun extends Attachment{
   constructor(host, texture, x, y){
     super(host, texture, x, y)
     this.range = 4000;
-    this.damage = 10;
-    this.maxAmmo = 8;
+    this.damage = 20;
+    this.maxAmmo = 12;
     this.ammo = this.maxAmmo;
-    this.firerate = 150 ;
+    this.firerate = 120 ;
     this.reloadTime = 1000
     this.loaded = true;
     this.reloading = false;
@@ -129,7 +130,7 @@ class MissleLauncher extends Attachment{
   }
   checkFire(){
 
-    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
+    if(this.loaded){
       // console.log("Can Shoot");
       var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
 
@@ -148,7 +149,7 @@ class MissleLauncher extends Attachment{
 
   fire(target){
     // return
-    if(this.loaded && this.host.state == 1){
+    if(this.loaded){
       this.launchMissle(target)
       this.ammo -= 1;
 
@@ -203,7 +204,7 @@ class SmartMissleLauncher extends Attachment{
   }
   checkFire(){
 
-    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
+    if(this.loaded){
       // console.log("Can Shoot");
       var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
 
@@ -222,7 +223,7 @@ class SmartMissleLauncher extends Attachment{
 
   fire(target){
     // return
-    if(this.loaded && this.host.state == 1){
+    if(this.loaded){
       this.launchMissle(target)
       this.ammo -= 1;
 
@@ -277,7 +278,7 @@ class SmartMissleLauncherV2 extends Attachment{
   }
   checkFire(){
 
-    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
+    if(this.loaded){
       // console.log("Can Shoot");
       var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
 
@@ -296,7 +297,7 @@ class SmartMissleLauncherV2 extends Attachment{
 
   fire(target){
     // return
-    if(this.loaded && this.host.state == 1){
+    if(this.loaded){
       this.launchMissle(target)
       this.ammo -= 1;
 
@@ -372,6 +373,8 @@ class Missle extends Steerable{
     if(this.distanceFrom(this.target) <= this.target.shortest*1.5){
       this.target.damage(this.damage)
       // console.log("Missle Hit");
+      // console.log(this.scene.events.eventNames());
+      var temp = this.scene.events.emit('missle-destroy',this.getPosition())
       this.alive = false
     }
     if(!this.target.alive){
@@ -389,38 +392,50 @@ class Missle extends Steerable{
 class Turret extends Attachment{
   constructor(host, texture, x, y){
     super(host, texture, x, y)
-    this.range = 6000;
-    this.damage = 10;
+    this.range = 10000;
+    this.damage = 40;
     this.maxAmmo = 100;
     this.ammo = this.maxAmmo;
     this.firerate = 20 ;
     this.reloadTime = 4000
     this.loaded = true;
     this.reloading = false;
+    this.target = Game.Utils.statics.BLANK
   }
 
 
   update(){
-
+    // console.log("update");
     this.checkFire()
     super.update()
     this.rotate()
 
   }
   checkFire(){
-    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
+    this.target = this.target || this.host.getTarget()
+    if(!this.target.alive)this.target = this.host.getTarget()
+    // console.log("----");
+    // console.log("1", this.loaded);
+    // console.log("2", this.host.state == 1 || this.host.state == 3);
+    // console.log("3", this.host.mode == Game.Utils.statics.commands.ATTACK);
+    // console.log("4", this.loaded && (this.host.state == 1 || this.host.state == 3) && this.host.mode == Game.Utils.statics.commands.ATTACK);
+    if(this.loaded){
       // console.log("Can Shoot");
-      var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
+      var line = this.target.getPosition().subtract(this.host.getPosition())
 
       var shortestAngle = Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(this.rotation), Phaser.Math.RadToDeg(line.toAngle()))
+      // console.log(line.length());
+      // console.log(line.length() <= this.range && -15 < shortestAngle && shortestAngle < 15);
       if(
         line.length() <= this.range && -15 < shortestAngle && shortestAngle < 15){
-        this.fire(this.host.getTarget())
+        this.fire(this.target)
+      }else{
+        this.target = this.host.target.formation.ships[Math.floor(Math.random()*(this.host.target.formation.ships.length-1))]
       }
     }
   }
   fire(){
-    if(this.loaded && this.host.state == 1){
+    if(this.loaded){
       var target = this.host.getTarget()
       // console.log("fire");
       // console.log("Pew");
@@ -469,7 +484,7 @@ class Turret extends Attachment{
       this.setRotation(Phaser.Math.Angle.RotateTo(
         this.rotation,
         this.host.rotation,
-        0.1
+        0.2
       ))
       }else{
         if(this.host.getPosition().subtract(this.host.getTarget().getPosition()).length() > 100){
@@ -477,7 +492,7 @@ class Turret extends Attachment{
           this.setRotation(Phaser.Math.Angle.RotateTo(
             this.rotation,
             this.host.getTarget().getPosition().subtract(this.host.getPosition()).toAngle(),
-            0.1
+            0.2
           ))
 
       }else{
@@ -485,7 +500,7 @@ class Turret extends Attachment{
         this.setRotation(Phaser.Math.Angle.RotateTo(
           this.rotation,
           this.host.rotation,
-          0.1
+          0.2
         ))
 
 
@@ -516,7 +531,7 @@ class HeavyTurret extends Attachment{
 
   }
   checkFire(){
-    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
+    if(this.loaded){
       // console.log("Can Shoot");
       var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
 
@@ -528,7 +543,7 @@ class HeavyTurret extends Attachment{
     }
   }
   fire(){
-    if(this.loaded && this.host.state == 1){
+    if(this.loaded){
       var target = this.host.getTarget()
       // console.log("fire");
       // console.log("Pew");
@@ -624,7 +639,7 @@ class SuperTurret extends Attachment{
 
   }
   checkFire(){
-    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
+    if(this.loaded){
       // console.log("Can Shoot");
       var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
 
@@ -731,7 +746,7 @@ class MegaGun extends Attachment{
   }
   checkFire(){
 
-    if(this.loaded && this.host.state == 1 && this.host.mode == Game.Utils.statics.commands.ATTACK){
+    if(this.loaded){
       // console.log("Can Shoot");
       var line = this.host.getTarget().getPosition().subtract(this.host.getPosition())
 
@@ -750,7 +765,7 @@ class MegaGun extends Attachment{
   }
 
   fire(){
-    if(this.loaded && this.host.state == 1){
+    if(this.loaded){
       var target = this.host.getTarget()
       // console.log("fire");
       // console.log("Pew");

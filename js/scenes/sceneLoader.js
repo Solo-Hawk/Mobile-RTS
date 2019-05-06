@@ -32,10 +32,28 @@ class SceneLoader extends Phaser.Scene{
       this.load.image(texture[0], texture[1])
     }, this)
 
+    var atlas = this.load.atlas({
+      key:'smoke',
+      textureURL: 'assets/particles/smoke/spritesheet.png',
+      atlasURL: 'assets/particles/smoke/sprites.json'
+    })
+    console.log(atlas);
+
+
 
   }
   create(){
 
+    this.anims.create({
+      key:'explode',
+      frames: this.anims.generateFrameNames('smoke', {
+            start: 1, end: 9, zeroPad: 3,
+            prefix: 'spaceEffects_', suffix: ''
+        }),
+        frameRate: 120,
+        duration: 120,
+        repeat: 0
+    })
   }
   update(){
 

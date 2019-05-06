@@ -16,6 +16,31 @@ class GameManager {
     this.emitters = []
     this.projectiles = []
     this.create = new Factory(this.scene, this)
+
+
+    this.explosions = this.scene.add.group({
+      defaultKey: 'smoke',
+      maxSize: 50
+    })
+    console.log(this.explosions);
+  }
+
+  makeListeners(){
+    this.scene.events.on('missle-destroy',this.createExplosion,this)
+    // console.log(this.scene.events.eventNames());
+  }
+  createExplosion(position){
+    var explosion = this.explosions.get(position.x, position.y)
+    explosion.setDepth(10);
+    explosion.setActive(true);
+    explosion.setVisible(true);
+    explosion.setScale(2)
+    explosion.on('animationcomplete', (animation, frame, gameObject)=>{
+
+      gameObject.setActive(false);
+      gameObject.setVisible(false);
+    }, this);
+    explosion.play('explode')
   }
   update(){
     // console.log(this.formations);
@@ -146,6 +171,7 @@ class GameManager {
   getPlayerFormations(){
     return this.player.formations
   }
+
 }
 
 class Factory{
@@ -171,7 +197,7 @@ class Factory{
     s.maxLinearAcceleration = 400
     s.ranges = {
       attackRange : 3000,
-      evadeRange  : 1000,
+      evadeRange  : 200,
       returnRange : 3000,
       engageRange : 7000
     }
@@ -193,7 +219,7 @@ class Factory{
     s.maxLinearAcceleration = 350
     s.ranges = {
       attackRange : 4000,
-      evadeRange  : 1400,
+      evadeRange  : 200,
       returnRange : 3000,
       engageRange : 7000
     }
@@ -215,6 +241,7 @@ class Factory{
     s.maxLinearSpeed = 3000
     s.maxLinearAcceleration = 20
     s.ranges = {
+      idleRange:3500,
       maintainRange:4000,
       engageRange: 6000
     }
@@ -237,6 +264,7 @@ class Factory{
     s.maxLinearSpeed = 2200
     s.maxLinearAcceleration = 12
     s.ranges = {
+      idleRange: 6000,
       maintainRange:7000,
       engageRange: 9000
     }
@@ -260,8 +288,9 @@ class Factory{
     s.maxLinearSpeed = 2200
     s.maxLinearAcceleration = 12
     s.ranges = {
-      maintainRange:7000,
-      engageRange: 9000
+      idleRange: 4000,
+      maintainRange:6000,
+      engageRange: 7000
     }
     s.setScale(2)
 
@@ -285,8 +314,9 @@ class Factory{
     s.maxLinearSpeed = 2200
     s.maxLinearAcceleration = 12
     s.ranges = {
-      maintainRange:7000,
-      engageRange: 9000
+      idleRange:1200,
+      maintainRange:2000,
+      engageRange: 3000
     }
     s.setScale(6)
 
@@ -294,7 +324,7 @@ class Factory{
     s.addAttachment(new Turret(s,'turret-01',-300,200).setScale(2))
     s.addAttachment(new Turret(s,'turret-01',100,-200).setScale(2))
     s.addAttachment(new Turret(s,'turret-01',-300,-200).setScale(2))
-    s.addAttachment(new SmartMissleLauncherV2(s,'missle-red',0,0,10,10,3000,21000, 20, 2000,5,3))
+    s.addAttachment(new SmartMissleLauncherV2(s,'missle-red',0,0,50,30,3000,21000, 120, 2000,5,3))
     // s.addAttachment(new SmartMissleLauncher(s,'missle-red',0,0,50,30,10000,16000, 300, 1400,400,3))
     if(formation){
       formation.addUnit(s)
@@ -312,6 +342,7 @@ class Factory{
     s.maxLinearSpeed = 2200
     s.maxLinearAcceleration = 12
     s.ranges = {
+      idleRange:12000,
       maintainRange:14000,
       engageRange: 15000
     }

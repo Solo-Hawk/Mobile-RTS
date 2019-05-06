@@ -128,7 +128,8 @@ class Fighter extends BaseShip{
           }
           break;
         case 2:
-          this.evade(this.target)
+          this.wander(10000,4)
+          // this.wander(10000,20)
           // this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
           // if(this.distanceFrom(this.target) <= this.ranges.engageRange + this.target.longest){
           //   this.target = this.getNearestTarget() || this.target
@@ -172,6 +173,7 @@ class Frigate extends BaseShip{
     // console.log(x,y);
     super(scene, x, y, texture, team)
     this.ranges = {
+      idleRange:3000,
       maintainRange:4000,
       engageRange: 6000
     }
@@ -206,12 +208,18 @@ class Frigate extends BaseShip{
       // console.log(this.state);
       switch (this.state) {
         case 1:
-          this.seek(this.target.getPosition(),this.ranges.maintainRange,10)
+
+          // console.log("Seek");
+          this.seek(this.target.getPosition(),this.ranges.maintainRange / 2)
           if(this.distanceFrom(this.target) >= this.ranges.engageRange && this.formation.flagship != this){
             this.state = 4
           }
+          if(this.distanceFrom(this.target) <= this.ranges.idleRange){
+            this.state = 3
+          }
           break;
         case 2:
+          // console.log("Evade");
           this.evade(this.target)
           this.setLinearVelocityLength(this.linearVelocity.length() + this.maxLinearAcceleration)
           if(this.distanceFrom(this.target) <= this.ranges.engageRange + this.target.longest){
@@ -221,6 +229,21 @@ class Frigate extends BaseShip{
             this.state = 4
           }
 
+          break;
+        case 3:
+          // console.log("Idle");
+          this.idle()
+          // console.log(!(this.distanceFrom(this.target) <= this.ranges.idleRange));
+          // console.log(this.distanceFrom(this.target) <= this.ranges.engageRange + this.target.longest);
+          if(this.distanceFrom(this.target) >= this.ranges.engageRange && this.formation.flagship != this){
+            this.state = 4
+          }
+          if(!(this.distanceFrom(this.target) <= this.ranges.idleRange)){
+            if(this.distanceFrom(this.target) >= this.ranges.engageRange + this.target.longest){
+              this.target = this.getNearestTarget() || this.target
+              this.state = 1
+            }
+          }
           break;
         case 4:
           this.seek(this.formation.getFormationPosition(this),8,8)

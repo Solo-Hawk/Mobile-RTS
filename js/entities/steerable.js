@@ -124,7 +124,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
     // console.log("idle");
     var force = Game.Utils.vector2d(0,0)
     force.set(this.linearVelocity.x, this.linearVelocity.y)
-    force.scale(0.9)
+    force.scale(0.999)
     this.setLinearVelocity(force)
   }
   seek(target, radius, brace){
@@ -190,7 +190,7 @@ class Steerable extends Phaser.GameObjects.Sprite {
       // console.log("STATIC UNIT");
       this.flee(target.getPosition())
     }else{
-      this.flee(target.getPosition().add(target.linearVelocity.clone().scale(ahead)).scale(this.maxLinearAcceleration))
+      this.flee(target.getPosition().add(target.linearVelocity.clone().scale(ahead)).scale(this.maxLinearAcceleration).add({x:Phaser.Math.Between(-1000,1000),y:Phaser.Math.Between(-1000,1000)}))
     }
 
     // console.log("Evade");

@@ -7,6 +7,9 @@ class SceneLevelDevelopment extends Phaser.Scene{
     this.scene.add("game-interface",new GameInterface(), false, this)
     this.scene.run("game-interface")
     this.GameInterface = this.scene.get("game-interface")
+    this.gameManager.makeListeners()
+    this.impact.world.setBounds(-45000,-4000,90000,8000)
+
 
   }
   create(){
@@ -20,7 +23,7 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
     this.cameraFrame.lineWidth = 3
     this.cameraFrame.strokeColor = 0x0000ff
-    this.minimap = this.cameras.add(config.width/2 - 500 , 10, 1000, 120).setZoom(0.009).setName('mini');
+    this.minimap = this.cameras.add(config.width/2 - 500 , 10, 1000, 80).setZoom(0.009).setName('mini');
     this.minimap.setBackgroundColor(0x002244);
     this.minimap.scrollX = 1600 - config.width/2;
     this.minimap.scrollY = 400;
@@ -42,7 +45,11 @@ class SceneLevelDevelopment extends Phaser.Scene{
         scene.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation)
         scene.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation)
         scene.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.PLAYER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
         scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
         scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
         scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.PLAYER,formation)
@@ -93,33 +100,9 @@ class SceneLevelDevelopment extends Phaser.Scene{
         scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
         scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
         scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
-        scene.gameManager.create.lightFighter(Game.Utils.statics.teams.COMPUTER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.COMPUTER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.COMPUTER,formation)
+        scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.COMPUTER,formation)
         scene.gameManager.create.heavyFighter(Game.Utils.statics.teams.COMPUTER,formation)
         scene.gameManager.create.bastionFrigate(Game.Utils.statics.teams.COMPUTER,formation)
         scene.gameManager.create.slammerFrigate(Game.Utils.statics.teams.COMPUTER,formation)
@@ -135,6 +118,7 @@ class SceneLevelDevelopment extends Phaser.Scene{
 
 
   update(delta,time){
+    // console.clear()
     if (this.cursors.left.isDown)
     {
         this.cameras.main.scrollX += - 300;
