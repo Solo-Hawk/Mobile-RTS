@@ -93,7 +93,7 @@ class SceneLoader extends Phaser.Scene{
 
     var assetText = this.make.text({
         x: width / 2,
-        y: height / 2 - 5,
+        y: height / 2 - 100,
         text: '',
         style: {
             font: '30px monospace',
