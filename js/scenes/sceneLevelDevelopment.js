@@ -19,6 +19,7 @@ class SceneLevelDevelopment extends Phaser.Scene{
     this.mainCamera = this.cameras.getCamera("");
     this.mainCamera.setZoom(0.12)
     this.mainCamera.setBounds(-50000,-5000,100000,10000,true)
+    this.cameras.main.scrollX = -50000
     this.cameraFrame = this.add.rectangle(this.mainCamera.scrollX + config.width/2, this.mainCamera.scrollY + config.height/2, this.mainCamera.width / 0.12, this.mainCamera.height/0.12, 0x0000ff, 0.2)
 
     this.cameraFrame.lineWidth = 3
