@@ -4,3 +4,6 @@
 *.db-wal
 
 *.db
+
+js/pre/*
+js/pre1/*

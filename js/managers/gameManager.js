@@ -1,58 +1,141 @@
-class GameManager{
-  constructor(gameScene, uiScene){
-    console.log(gameScene, uiScene);
-    this.gameScene = gameScene
-    this.uiScene = uiScene
-    this.units = []
+class GameManager {
+  constructor(scene) {
+    this.scene = scene
+    this.ships = []
+    this.player = {
+      base: null,
+      ships:[],
+      formations:[]
+    }
+    this.comp = {
+      base: null,
+      ships:[],
+      formations:[]
+    }
     this.formations = []
-    this.factory = {
-      add: new class{
-        constructor(){
-          this.gameManager;
-        }
-        setManager(gameManager){
-          this.gameManager = gameManager
-        }
-        Formation(units, leader, team){
-          var formation = new Formation(this.gameManager, units, leader, team)
-          this.gameManager.formations.push(formation)
-          return formation
-        }
-        BaseUnit(scene, x, y, texture, team, formation, objective){
-          console.log(scene);
-          var u = new BaseUnit(this.gameManager, scene,x,y,texture,team, formation, objective)
-          this.gameManager.units.push(u)
-          return u
-        }
-        SlowUnit(scene, x, y, texture, team, formation, objective){
-          console.log(scene);
-          var u = new SlowUnit(this.gameManager, scene,x,y,texture,team, formation, objective)
-          this.gameManager.units.push(u)
-          return u
-        }
-        FastUnit(scene, x, y, texture, team, formation, objective){
-          console.log(scene);
-          var u = new FastUnit(this.gameManager, scene,x,y,texture,team, formation, objective)
-          this.gameManager.units.push(u)
-          return u
-        }
-      }
-    }
-    this.factory.add.setManager(this)
+    this.emitters = []
+    this.projectiles = []
+    this.create = new Factory(this.scene, this)
+    this.tick = 0
   }
-
-  getNearestFormation(formation,distance){
-    for(var i = 0; i < this.formations.length; i++){
-      if(this.formations[i] != formation && this.formations[i] != formation.team){
-        var length = formation.flagship.getPosition().subtract(this.formations[i].flagship.getPosition()).length()
-        if(length <= distance){return this.formations[i]}
-      }
-    }
-  }
-
-
   update(){
-    this.formations.forEach((formation)=>{formation.refresh();formation.update()})
-    this.units.forEach((unit)=>{unit.update()})
+    if(this.tick == 0){
+      this.formations.forEach((formation)=>{
+        formation.update()
+        if(formation.ships.length == 0){
+          this.formations = Game.Utils.arrayRemove(this.formations, formation)
+        }
+      },this)
+    }
+    this.ships.forEach((ship)=>{
+      ship.update()
+    })
+    this.projectiles.forEach((projectile)=>{
+      projectile.update()
+    })
+    if(this.ships.length > (this.player.length + this.comp.length)){
+      this.sort()
+    }
+    this.tick++
+    if(this.tick >= 5){
+      this.tick = 0
+    }
+  }
+  sort(){
+    this.ships.forEach((ship)=>{
+      switch (ship.team) {
+        case Game.Utils.statics.teams.PLAYER:
+          if(this.player.indexOf(ship) == -1){
+            this.player.ships.push(ship)
+          }
+          break;
+        case Game.Utils.statics.teams.COMPUTER:
+          if(this.comp.indexOf(ship) == -1){
+            this.comp.ships.push(ship)
+          }
+          break;
+
+
+      }
+    }, this)
+    this.formations.forEach((ship)=>{
+      switch (ship.team) {
+        case Game.Utils.statics.teams.PLAYER:
+          if(this.player.indexOf(ship) == -1){
+            this.player.formations.push(ship)
+          }
+          break;
+        case Game.Utils.statics.teams.COMPUTER:
+          if(this.comp.indexOf(ship) == -1){
+            this.comp.formations.push(ship)
+          }
+          break;
+
+
+      }
+    }, this)
+  }
+
+}
+
+class Factory{
+  constructor(scene, manager){
+    this.scene = scene
+    this.manager = manager
+  }
+  formation(team, ships){
+    team = team || Game.Utils.statics.teams.NEUTRAL
+    ships = ships || []
+    var f = new Formation(this.manager, team, ships)
+    this.manager.formations.push(f)
+    return f
+  }
+  base(){
+
+  }
+  lightFighter(team,x,y){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    x = x || 0;
+    y = y || 0;
+    console.log(x,y);
+    var s = new Fighter(this.scene, x, y, 'light-fighter-'+this.getColor(team), team)
+    s.rating = 10
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+  heavyFighter(team,x,y){
+    if(team == Game.Utils.statics.teams.NEUTRAL){console.log("No Team"); return}
+    x = x || 0;
+    y = y || 0;
+    var s = new Fighter(this.scene, x, y, 'heavy-fighter-'+this.getColor(team), team)
+    s.rating = 30
+    s.setScale(1.6)
+    s.maxLinearSpeed = 1200
+    s.maxLinearAcceleration = 50
+    this.manager.ships.push(s)
+    this.manager.sort()
+    return s
+  }
+  fighterGun(ship){
+    if(ship){
+
+    }
+  }
+  missleLauncher(ship){
+    if(ship){
+
+    }
+
+  }
+  turret(ship){
+    if(ship){
+
+    }
+
+  }
+
+  getColor(team){
+    return team == Game.Utils.statics.teams.PLAYER? 'blue' : 'red'
   }
 }

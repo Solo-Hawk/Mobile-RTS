@@ -1,11 +1,65 @@
+var resources = [
+  ['heavy-fighter-red' , 'assets/ships/red/enemyRed4.png'],
+  ['heavy-fighter-blue', 'assets/ships/blue/enemyBlue4.png'],
+  ['light-fighter-red' , 'assets/ships/red/enemyRed3.png'],
+  ['light-fighter-blue', 'assets/ships/blue/enemyBlue3.png'],
+  ['swatter-frigate-red', 'assets/ships/red/enemyRed1.png'],
+  ['swatter-frigate-blue', 'assets/ships/blue/enemyBlue1.png'],
+  ['bastion-frigate-red', 'assets/ships/red/enemyRed6.png'],
+  ['bastion-frigate-blue', 'assets/ships/blue/enemyBlue6.png'],
+  ['slammer-frigate-red', 'assets/ships/red/enemyRed7.png'],
+  ['slammer-frigate-blue', 'assets/ships/blue/enemyBlue7.png'],
+  ['leviathan-cruiser-red', 'assets/ships/red/ship_red_levithan.png'],
+  ['leviathan-cruiser-blue', 'assets/ships/blue/ship_blue_levithan.png'],
+  ['hunter-cruiser-red', 'assets/ships/red/ship_red_hunter.png'],
+  ['hunter-cruiser-blue', 'assets/ships/blue/ship_blue_hunter.png'],
+  ['home-base-red'     , 'assets/buildings/home_red.png'],
+  ['home-base-blue'    , 'assets/buildings/home_blue.png'],
+  ['missle-red', 'assets/missles/spaceMissiles_009.png'],
+  ['missle-blue', 'assets/missles/spaceMissiles_010.png'],
+  ['turret-01', 'assets/turret/turret01.png']
+]
 class SceneLoader extends Phaser.Scene{
   constructor(){
     super("loader")
   }
   preload(){
-    {
-    console.log(this);
+    // console.log(this);
+    this.createProgressBar.call(this)
     // All Main Assets are loaded here
+
+    resources.forEach((texture)=>{
+      this.load.image(texture[0], texture[1])
+    }, this)
+
+    var atlas = this.load.atlas({
+      key:'smoke',
+      textureURL: 'assets/particles/smoke/spritesheet.png',
+      atlasURL: 'assets/particles/smoke/sprites.json'
+    })
+    console.log(atlas);
+
+
+
+  }
+  create(){
+
+    this.anims.create({
+      key:'explode',
+      frames: this.anims.generateFrameNames('smoke', {
+            start: 1, end: 9, zeroPad: 3,
+            prefix: 'spaceEffects_', suffix: ''
+        }),
+        frameRate: 120,
+        duration: 120,
+        repeat: 0
+    })
+  }
+  update(){
+
+  }
+
+  createProgressBar(){
     var progressBar = this.add.graphics();
 
     var width = this.cameras.main.width;
@@ -31,7 +85,7 @@ class SceneLoader extends Phaser.Scene{
         y: height / 2 - 5,
         text: '0%',
         style: {
-            font: '18px monospace',
+            font: '30px monospace',
             fill: '#ffffff'
         }
     });
@@ -39,14 +93,14 @@ class SceneLoader extends Phaser.Scene{
 
     var assetText = this.make.text({
         x: width / 2,
-        y: height / 2 + 65,
+        y: height / 2 - 100,
         text: '',
         style: {
-            font: '18px monospace',
+            font: '30px monospace',
             fill: '#ffffff'
         }
     });
-
+    console.log(assetText);
     assetText.setOrigin(0.5, 0.5);
 
     this.load.on('progress', function (value) {
@@ -57,7 +111,7 @@ class SceneLoader extends Phaser.Scene{
     });
 
     this.load.on('fileprogress', function (file) {
-        assetText.setText('Loading asset: ' + file.key);
+                assetText.setText('Loading asset: ' + file.src);
     });
 
     this.load.on('complete', function () {
@@ -68,17 +122,5 @@ class SceneLoader extends Phaser.Scene{
         assetText.destroy();
         this.scene.switch("mainmenu")
     }, this);
-  }
-
-    this.load.image('1Heavy', 'assets/ship_blue_heavy.png');
-    this.load.image('2Heavy', 'assets/ship_red_heavy.png');
-    this.load.image('1Light', 'assets/ship_blue_light.png');
-    this.load.image('2Light', 'assets/ship_red_light.png');
-  }
-  create(){
-
-  }
-  update(){
-
   }
 }
