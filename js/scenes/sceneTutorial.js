@@ -15,7 +15,7 @@ class SceneTutorial extends Phaser.Scene{
     var loadingText = this.make.text({
         x: this.width / 2,
         y: this.height / 2 - 100,
-        text: 'Space RTS \n \n Build formations using the build button, Launch using the launch button \n \n Tier 1 - Fighters - Cheap Expendable Units \n    Light - Anti Heavy Fighter | Heavy - Anti Frigate  \n\n Tier 2 - Frigates - Armoured Counter Units \n    Swatter - Anti Fighter     | Bastion - Anti Frigate | Slammer - Anti Cruiser \n \n Tier 3 - Cruisers - Heavy Units | Super Anti Swarn or Anti Frigates \n    Leviathan - Anti Fighter   | Hunter - Anti Frigate / Cruisers \n \n The computer will slowly get more and more powerful \n \n Plan your formations and always keep money for last minute counters \n \n When you base health = 0 you lose' ,
+        text: 'Space RTS \n \n You are Blue \n \n Build formations using the build button, Launch using the launch button \n \n Tier 1 - Fighters - Cheap Expendable Units \n    Light - Anti Heavy Fighter | Heavy - Anti Frigate  \n\n Tier 2 - Frigates - Armoured Counter Units \n    Swatter - Anti Fighter     | Bastion - Anti Frigate | Slammer - Anti Cruiser \n \n Tier 3 - Cruisers - Heavy Units | Super Anti Swarn or Anti Frigates \n    Leviathan - Anti Fighter   | Hunter - Anti Frigate / Cruisers \n \n The computer will slowly get more and more powerful \n \n Plan your formations and always keep money for last minute counters \n \n When you base health = 0 you lose' ,
         style: {
             font: '32px monospace',
             fill: '#ffffff'
